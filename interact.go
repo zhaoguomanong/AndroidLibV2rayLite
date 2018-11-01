@@ -292,10 +292,10 @@ func NewV2RayPoint() *V2RayPoint {
 		if strings.HasPrefix(path, assetperfix) {
 			p := path[len(assetperfix)+1:]
 			//is it overridden?
-			by, ok := overridedAssets[p]
-			if ok {
-				return os.Open(by)
-			}
+			//by, ok := overridedAssets[p]
+			//if ok {
+			//	return os.Open(by)
+			//}
 			return mobasset.Open(p)
 		}
 		return os.Open(path)

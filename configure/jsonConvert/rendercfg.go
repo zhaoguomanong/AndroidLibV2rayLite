@@ -4,11 +4,11 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"os"
+	"os"
 	"strings"
 
-	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
-	"github.com/xiaokangwang/AndroidLibV2ray/Process"
+	"github.com/2dust/AndroidLibV2rayLite/CoreI"
+	"github.com/2dust/AndroidLibV2rayLite/Process"
 )
 
 func (v *JsonToPbConverter) renderAll() {

@@ -4,9 +4,9 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/xiaokangwang/AndroidLibV2ray/CoreI"
-	"github.com/xiaokangwang/AndroidLibV2ray/Process"
-	"github.com/xiaokangwang/AndroidLibV2ray/configure"
+	"github.com/2dust/AndroidLibV2rayLite/CoreI"
+	"github.com/2dust/AndroidLibV2rayLite/Process"
+	"github.com/2dust/AndroidLibV2rayLite/configure"
 )
 
 func (v *UpDownScript) Runbash(cc string, env []string) error {

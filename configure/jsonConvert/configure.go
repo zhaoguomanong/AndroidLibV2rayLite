@@ -11,7 +11,7 @@ import (
 	"log"
 
 	simplejson "github.com/bitly/go-simplejson"
-	"github.com/xiaokangwang/AndroidLibV2ray/configure"
+	"github.com/2dust/AndroidLibV2rayLite/configure"
 	v2rayJsonWithComment "v2ray.com/ext/encoding/json"
 )
 

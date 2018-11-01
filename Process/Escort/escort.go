@@ -6,9 +6,9 @@ import (
 
 	"log"
 )
-import "github.com/xiaokangwang/AndroidLibV2ray/configure"
-import "github.com/xiaokangwang/AndroidLibV2ray/CoreI"
-import "github.com/xiaokangwang/AndroidLibV2ray/Process"
+import "github.com/2dust/AndroidLibV2rayLite/configure"
+import "github.com/2dust/AndroidLibV2rayLite/CoreI"
+import "github.com/2dust/AndroidLibV2rayLite/Process"
 
 func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd int) {
 	count := 42

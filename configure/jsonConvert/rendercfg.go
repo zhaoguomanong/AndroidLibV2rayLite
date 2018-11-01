@@ -4,7 +4,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"os"
+	"os"
 	"strings"
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"

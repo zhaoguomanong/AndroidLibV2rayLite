@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package kkdev.v2ray.LibV2Ray;
+package com.v2ray.LibV2Ray;
 option go_package = "configure";
 
 

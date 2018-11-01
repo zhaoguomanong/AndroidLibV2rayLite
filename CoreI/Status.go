@@ -17,9 +17,9 @@ func (v *Status) GetDataDir() string {
 }
 
 func (v *Status) getDataDir() string {
-	var datadir = "/data/data/org.kkdev.v2raygo/"
+	var datadir = "/data/data/com.v2ray.ang/"
 	if v.PackageName != "" {
-		datadir = "/data/data/" + v.PackageName + "/"
+		datadir = "/data/user/" + strconv.Itoa(os.Getuid()/100000) + "/" + v.PackageName + "/"
 	}
 	return datadir
 }

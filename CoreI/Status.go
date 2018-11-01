@@ -2,6 +2,8 @@ package CoreI
 
 import (
 	"v2ray.com/core"
+	"os"
+	"strconv"
 )
 
 type Status struct {

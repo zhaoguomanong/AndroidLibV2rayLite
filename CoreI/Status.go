@@ -19,6 +19,9 @@ func (v *Status) GetDataDir() string {
 }
 
 func (v *Status) getDataDir() string {
+	return v.PackageName
+	
+	/*
 	var datadir = "/data/data/com.v2ray.ang/"
 	if v.PackageName != "" {
 		datadir = "/data/user/" + strconv.Itoa(os.Getuid()/100000) + "/" + v.PackageName + "/"
@@ -27,6 +30,7 @@ func (v *Status) getDataDir() string {
 		}
 	}
 	return datadir
+	*/
 }
 
 func Exists(path string) bool {

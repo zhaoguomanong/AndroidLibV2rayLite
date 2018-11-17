@@ -8,8 +8,6 @@ import (
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 	"github.com/2dust/AndroidLibV2rayLite/configure"
-	"github.com/xiaokangwang/waVingOcean"
-	voconfigure "github.com/xiaokangwang/waVingOcean/configure"
 
 	"golang.org/x/sys/unix"
 
@@ -33,14 +31,10 @@ func (v *VPNSupport) VpnSupportReady() {
 	}
 }
 func (v *VPNSupport) startVPNRequire() {
-	if !v.usewaVingOceanVPNBackend {
-		v.Estr = Escort.NewEscort()
-		v.Estr.SetStatus(v.status)
-		v.Estr.EscortingUPV()
-		go v.Estr.EscortRun(v.Conf.Service.Target, v.Conf.Service.Args, false, v.VpnSupportSet.GetVPNFd())
-	} else {
-		v.startNextGen()
-	}
+	v.Estr = Escort.NewEscort()
+	v.Estr.SetStatus(v.status)
+	v.Estr.EscortingUPV()
+	go v.Estr.EscortRun(v.Conf.Service.Target, v.Conf.Service.Args, false, v.VpnSupportSet.GetVPNFd())	
 }
 
 func (v *VPNSupport) askSupportSetInit() {
@@ -70,12 +64,7 @@ func (v *VPNSupport) VpnShutdown() {
 		println(err)
 		//}
 		v.VpnSupportSet.Shutdown()
-		if !v.usewaVingOceanVPNBackend {
-			v.Estr.EscortingDown()
-		} else {
-			v.stopNextGen()
-		}
-
+		v.Estr.EscortingDown()
 	}
 	v.status.VpnSupportnodup = false
 }
@@ -91,28 +80,6 @@ type VPNSupport struct {
 	status                   *CoreI.Status
 	Conf                     configure.VPNConfig
 	Estr                     *Escort.Escorting
-	usewaVingOceanVPNBackend bool
-	lowerup                  *wavingocean.LowerUp
-}
-
-func (v *VPNSupport) startNextGen() {
-	tapfd := v.VpnSupportSet.GetVPNFd()
-	syscall.SetNonblock(tapfd, false)
-	f := os.NewFile(uintptr(tapfd), "/dev/tap0")
-	cfg := new(voconfigure.WaVingOceanConfigure)
-	cfg.PublicOnly = false
-	cfg.EnableDnsCache = false
-	cfg.DNSServers = make([]string, 0)
-	v.lowerup = wavingocean.NewLowerUp(*cfg, f, &V2Dialer{ser: v.status.Vpoint.(*core.Instance)}, context.TODO())
-	go v.lowerup.Up()
-}
-
-func (v *VPNSupport) OptinNextGenerationTunInterface() {
-	v.usewaVingOceanVPNBackend = true
-}
-
-func (v *VPNSupport) stopNextGen() {
-	v.lowerup.Down()
 }
 
 type V2RayVPNServiceSupportsSet interface {

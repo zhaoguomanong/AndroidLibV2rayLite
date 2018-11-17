@@ -18,7 +18,6 @@ import (
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
-	"github.com/2dust/AndroidLibV2rayLite/Process/UpDownScript"
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
 	"github.com/2dust/AndroidLibV2rayLite/configure"
 	"github.com/2dust/AndroidLibV2rayLite/configure/jsonConvert"
@@ -48,7 +47,6 @@ type V2RayPoint struct {
 	v2rayOP         *sync.Mutex
 	Context         *V2RayContext
 	VPNSupports     *VPN.VPNSupport
-	UpdownScripts   *UpDownScript.UpDownScript
 	interuptDeferto int64
 
 	//Legacy prop, should use Context instead
@@ -208,20 +206,6 @@ func (v *V2RayPoint) pointloop() {
 		/* TODO: setup VPN
 		v.vpnSetup()
 		*/
-		v.UpdownScripts.SetStatus(v.status)
-		v.UpdownScripts.Configure = v.confng.RootModeConf.Scripts
-		v.UpdownScripts.Env = v.confng.Env
-		v.UpdownScripts.RunUpScript()
-		/* TODO: Run Up Script
-		if v.conf != nil {
-			env := v.conf.additionalEnv
-			log.Trace(errors.New("Exec Upscript()"))
-			err = v.runbash(v.conf.upscript, env)
-			if err != nil {
-				log.Trace(errors.New("OnUp failed to exec").Base(err))
-			}
-		}
-		*/
 	}
 	v.Callbacks.OnEmitStatus(0, "Running")
 	//v.parseCfgDone()
@@ -246,16 +230,6 @@ func (v *V2RayPoint) stopLoopW() {
 	v.status.IsRunning = false
 	v.status.Vpoint.Close()
 	if v.confng != nil {
-		v.UpdownScripts.RunDownScript()
-		/* TODO:Run Down Script
-		if v.conf != nil {
-			env := v.conf.additionalEnv
-			log.Trace(errors.New("Running downscript"))
-			err := v.runbash(v.conf.downscript, env)
-
-			if err != nil {
-				log.Trace(errors.New("OnDown failed to exec").Base(err))
-			}*/
 		v.VPNSupports.VpnShutdown()
 		v.escorter.EscortingDown()
 		/* TODO: Escort Down
@@ -302,7 +276,7 @@ func NewV2RayPoint() *V2RayPoint {
 	}
 	//platform.ForceReevaluate()
 	//panic("Creating VPoint")
-	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}, UpdownScripts: &UpDownScript.UpDownScript{}}
+	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}}
 }
 
 /*NetworkInterrupted inform us to restart the v2ray,

@@ -27,14 +27,8 @@ message EscortedProcess{
   bool Forgiveable = 3;
 }
 
-message UpDownScripts{
-  string UpScript = 1;
-  string DownScript = 2;
-}
-
 message RootModeConfig {
   repeated EscortedProcess Escorting = 1;
-  UpDownScripts Scripts = 2;
 }
 message EnvironmentVar {
   map<string, string> Vars = 3;

@@ -16,8 +16,6 @@ import (
 )
 
 type libv2rayconf struct {
-	upscript      string
-	downscript    string
 	additionalEnv []string
 	esco          []libv2rayconfEscortTarget
 	rend          []libv2rayconfRenderCfgTarget
@@ -67,8 +65,6 @@ func (v *JsonToPbConverter) parseConf() error {
 
 	v.conf = &libv2rayconf{}
 
-	v.conf.upscript = jsonStringDefault(libconf.GetPath("listener", "onUp"), "#none")
-	v.conf.downscript = jsonStringDefault(libconf.GetPath("listener", "onDown"), "#none")
 	v.conf.additionalEnv, err = libconf.GetPath("env").StringArray()
 	if err != nil {
 		//v.Callbacks.OnEmitStatus(-2, err.Error())

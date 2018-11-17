@@ -1,9 +1,6 @@
 package VPN
 
 import (
-	"context"
-	"os"
-	"syscall"
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
@@ -11,7 +8,6 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"v2ray.com/core"
 	"v2ray.com/core/transport/internet"
 )
 

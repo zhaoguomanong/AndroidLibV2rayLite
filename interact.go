@@ -97,50 +97,6 @@ func (v *V2RayPoint) pointloop() {
 				}
 			}
 		}
-	} else {
-		//First Guess File type
-		Type, err := vlencoding.GuessConfigType(v.Context.GetConfigureFile())
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if Type == vlencoding.LibV2RayPackedConfig_FullJsonFile {
-			//Convert is needed
-			jc := &jsonConvert.JsonToPbConverter{}
-			jc.Datadir = v.status.PackageName
-			//Load File From Context
-			cf := v.Context.GetConfigureFile()
-			jc.LoadFromFile(cf)
-			jc.Parse()
-			v.confng = jc.ToPb()
-			jsonctx, _ := os.Open(cf)
-			configx, err := v2rayconf.LoadJSONConfig(jsonctx)
-			if err != nil {
-				log.Println("JSON Parse Err:" + err.Error())
-
-			}
-			if configx != nil {
-				config = *configx
-			}
-			jsonctx.Close()
-		} else if Type == vlencoding.LibV2RayPackedConfig_FullProto {
-			buf, _ := ioutil.ReadFile(v.Context.GetConfigureFile())
-			err = proto.Unmarshal(buf, &config)
-			//Assert V2RayPart
-			for _, a := range config.GetExtension() {
-				d, _ := a.GetInstance()
-				switch vn := d.(type) {
-				case *configure.LibV2RayConf:
-					v.confng = vn
-				default:
-				}
-			}
-		} else {
-
-			//Yet To Support
-			return
-		}
 	}
 	var err error
 	//TODO:Load Shipped Binary

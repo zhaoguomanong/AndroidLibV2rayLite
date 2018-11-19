@@ -17,23 +17,10 @@ import (
 
 type libv2rayconf struct {
 	additionalEnv []string
-	esco          []libv2rayconfEscortTarget
-	rend          []libv2rayconfRenderCfgTarget
 	vpnConfig     vpnserviceConfig
 	dnsloopfix    vpnserviceDnsloopFix
 }
 
-type libv2rayconfEscortTarget struct {
-	Target      string   `json:"Target"`
-	Args        []string `json:"Args"`
-	Forgiveable bool     `json:"Forgiveable"`
-}
-
-type libv2rayconfRenderCfgTarget struct {
-	Target string   `json:"Target"`
-	Args   []string `json:"Args"`
-	Source string   `json:"Source"`
-}
 type JsonToPbConverter struct {
 	conf    *libv2rayconf
 	reading string
@@ -54,14 +41,6 @@ func (v *JsonToPbConverter) parseConf() error {
 		log.Print("No Vendor Conf found.")
 		return nil
 	}
-	enabled, err := libconf.GetPath("enabled").Bool()
-	if err != nil {
-		//v.Callbacks.OnEmitStatus(-2, err.Error())
-		return err
-	}
-	if !enabled {
-		return nil
-	}
 
 	v.conf = &libv2rayconf{}
 
@@ -70,44 +49,7 @@ func (v *JsonToPbConverter) parseConf() error {
 		//v.Callbacks.OnEmitStatus(-2, err.Error())
 		return err
 	}
-
-	escortconfjson, exist := libconf.CheckGet("escort")
-	if exist {
-		/*
-			var ok bool
-			v.conf.esco, ok = escortconfjson.Interface().([]libv2rayconfEscortTarget)
-			if !ok {
-				v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config escort")
-				return errors.New("Failed Type Assert: Config escort")
-			}*/
-		esco, ok := escortconfjson.MarshalJSON()
-		if ok != nil {
-			//v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config escort")
-			return errors.New("Failed Type Assert: Config escort")
-		}
-		err := json.Unmarshal(esco, &v.conf.esco)
-		if err != nil {
-			//v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config escortX")
-			return errors.New("Failed Type Assert: Config escortX")
-		}
-
-	}
-
-	renderconfjson, exist := libconf.CheckGet("render")
-	if exist {
-		rend, ok := renderconfjson.MarshalJSON()
-		if ok != nil {
-			//v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config render")
-			return errors.New("Failed Type Assert: Config render")
-		}
-		err := json.Unmarshal(rend, &v.conf.rend)
-		if err != nil {
-			//v.Callbacks.OnEmitStatus(-2, "Failed Type Assert: Config renderX")
-			log.Println(err, "Failed Type Assert: Config renderX")
-			return errors.New("Failed Type Assert: Config renderX")
-		}
-	}
-
+	
 	vpnConfigconfjson, exist := libconf.CheckGet("vpnservice")
 	if exist {
 		vpnConfig, ok := vpnConfigconfjson.MarshalJSON()

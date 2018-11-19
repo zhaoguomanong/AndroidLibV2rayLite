@@ -11,9 +11,6 @@ func ConvertToPb(leagcy libv2rayconf) *configure.LibV2RayConf {
 	NextGenerationProtobufConfigureStruct := &configure.LibV2RayConf{}
 	NextGenerationProtobufConfigureStruct.NoAutoConvert = true
 	NextGenerationProtobufConfigureStruct.RootModeConf = &configure.RootModeConfig{}
-	NextGenerationProtobufConfigureStruct.RootModeConf.Scripts = &configure.UpDownScripts{}
-	NextGenerationProtobufConfigureStruct.RootModeConf.Scripts.UpScript = leagcy.upscript
-	NextGenerationProtobufConfigureStruct.RootModeConf.Scripts.DownScript = leagcy.downscript
 	NextGenerationProtobufConfigureStruct.RootModeConf.Escorting = make([]*configure.EscortedProcess, 0, len(leagcy.esco))
 	for _, EscortedProcessInLegacy := range leagcy.esco {
 		designatedAppendee := new(configure.EscortedProcess)

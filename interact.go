@@ -16,11 +16,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
-	"github.com/2dust/AndroidLibV2rayLite/Process"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
 	"github.com/2dust/AndroidLibV2rayLite/shippedBinarys"
-	vlencoding "github.com/xiaokangwang/V2RayConfigureFileUtil/encoding"
 	mobasset "golang.org/x/mobile/asset"
 	v2rayconf "v2ray.com/ext/tools/conf/serial"
 )

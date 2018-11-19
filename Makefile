@@ -10,9 +10,6 @@ shippedBinary:
 	cd shippedBinarys; $(MAKE) shippedBinary
 
 fetchDep:
-	-go get  github.com/xiaokangwang/V2RayConfigureFileUtil
-	-cd $(GOPATH)/src/github.com/xiaokangwang/V2RayConfigureFileUtil;$(MAKE) all
-	go get  github.com/xiaokangwang/V2RayConfigureFileUtil
 	-go get  github.com/2dust/AndroidLibV2rayLite
 	-cd $(GOPATH)/src/github.com/xiaokangwang/libV2RayAuxiliaryURL; $(MAKE) all
 	-go get  github.com/2dust/AndroidLibV2rayLite

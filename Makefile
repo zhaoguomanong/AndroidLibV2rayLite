@@ -11,8 +11,6 @@ shippedBinary:
 
 fetchDep:
 	-go get  github.com/2dust/AndroidLibV2rayLite
-	-cd $(GOPATH)/src/github.com/xiaokangwang/libV2RayAuxiliaryURL; $(MAKE) all
-	-go get  github.com/2dust/AndroidLibV2rayLite
 	go get github.com/2dust/AndroidLibV2rayLite
 
 ANDROID_HOME=$(HOME)/android-sdk-linux

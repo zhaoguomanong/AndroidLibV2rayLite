@@ -18,14 +18,14 @@ func (v *VPNSupport) prepareDomainName() {
 	}
 	v.prepareddomain.tcpprepared = make(map[string](*net.TCPAddr))
 	v.prepareddomain.udpprepared = make(map[string](*net.UDPAddr))
-	for _, domainName := range v.Conf.PreparedDomainName.DomainNameList {
+	for _, domainName := range v.status.GetDomainNameList {
 		log.Println("Preparing DNS,", domainName)
 		var err error
-		v.prepareddomain.tcpprepared[domainName], err = net.ResolveTCPAddr(v.Conf.PreparedDomainName.TCPVersion, domainName)
+		v.prepareddomain.tcpprepared[domainName], err = net.ResolveTCPAddr("tcp4", domainName)
 		if err != nil {
 			log.Println(err)
 		}
-		v.prepareddomain.udpprepared[domainName], err = net.ResolveUDPAddr(v.Conf.PreparedDomainName.UDPVersion, domainName)
+		v.prepareddomain.udpprepared[domainName], err = net.ResolveUDPAddr("udp4", domainName)
 		spew.Dump(v.prepareddomain.udpprepared[domainName])
 		if err != nil {
 			log.Println(err)

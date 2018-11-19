@@ -41,3 +41,9 @@ func (v *Status) GetTun2socksArgs() []string {
                     "4",
                     "--enable-udprelay"}
 }
+
+
+func (v *Status) GetDomainNameList() []string {
+	return []string{"baidu.com"}
+}
+

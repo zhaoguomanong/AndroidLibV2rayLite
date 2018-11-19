@@ -86,16 +86,6 @@ func (v *V2RayPoint) pointloop() {
 		log.Println(err)
 	}
 
-	/*TODO:Load Client Config
-	config, err := v2rayconf.LoadJSONConfig(v.parseCfg())
-	if err != nil {
-		log.Trace(errors.New("Failed to read config file (", v.ConfigureFile, "): ", v.ConfigureFile).Base(err).AtError())
-
-		v.Callbacks.OnEmitStatus(-1, "Failed to read config file ("+v.ConfigureFile+")")
-
-		return
-	}*/
-
 	v.status.Vpoint, err = core.New(&config)
 	if err != nil {
 		log.Println("VPoint Start Err:" + err.Error())
@@ -133,7 +123,7 @@ func (v *V2RayPoint) pointloop() {
 			v.interuptDeferto = 0
 		}()
 		//Set Necessary Props First
-		v.VPNSupports.Conf = *v.confng.GetVpnConf()
+		
 		v.VPNSupports.SetStatus(v.status)
 		v.VPNSupports.VpnSetup()
 		/* TODO: setup VPN

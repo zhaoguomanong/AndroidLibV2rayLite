@@ -35,24 +35,15 @@ func (v *VPNSupport) VpnSetup() {
 		v.prepareDomainName()
 		v.askSupportSetInit()
 }
-func (v *VPNSupport) VpnShutdown() {
+func (v *VPNSupport) VpnShutdown() {	
 
-	if v.Conf.Service.VPNSetupArg != "" {
-		/*
-			BUG DISCOVERED!
+	//if v.VpnSupportnodup {
+	err := unix.Close(v.VpnSupportSet.GetVPNFd())
+	println(err)
+	//}
+	v.VpnSupportSet.Shutdown()
+		
 
-			v.VpnSupportnodup can have unexpected value cause VPN failed to revoke.
-			more testing needed.
-
-		*/
-
-		//if v.VpnSupportnodup {
-		err := unix.Close(v.VpnSupportSet.GetVPNFd())
-		println(err)
-		//}
-		v.VpnSupportSet.Shutdown()
-		 
-	}
 	v.status.VpnSupportnodup = false
 }
 

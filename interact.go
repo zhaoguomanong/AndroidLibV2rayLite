@@ -3,7 +3,6 @@ package libv2ray
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -14,7 +13,6 @@ import (
 	"v2ray.com/core"
 	"v2ray.com/ext/sysio"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
@@ -196,7 +194,7 @@ func NewV2RayPoint() *V2RayPoint {
 	}
 	//platform.ForceReevaluate()
 	//panic("Creating VPoint")
-	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}}
+	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, VPNSupports: &VPN.VPNSupport{}}
 }
 
 /*NetworkInterrupted inform us to restart the v2ray,

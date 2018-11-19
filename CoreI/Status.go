@@ -18,15 +18,26 @@ func (v *Status) GetDataDir() string {
 
 func (v *Status) getDataDir() string {
 	return v.PackageName
-	
-	/*
-	var datadir = "/data/data/com.v2ray.ang/"
-	if v.PackageName != "" {
-		datadir = "/data/user/" + strconv.Itoa(os.Getuid()/100000) + "/" + v.PackageName + "/"
-		if !Exists(datadir) {
-			datadir = "/data/data/" + v.PackageName + "/"
-		}
-	}
-	return datadir
-	*/
+}
+
+func (v *Status) GetTun2socks() string {
+	return v.PackageName + "tun2socks"
+}
+
+func (v *Status) GetTun2socksArgs() []string {
+	return []string{"--netif-ipaddr",
+                    "26.26.26.2",
+                    "--netif-netmask",
+                    "255.255.255.0",
+                    "--socks-server-addr",
+                    "127.0.0.1:10808",
+                    "--tunfd",
+                    "3",
+                    "--tunmtu",
+                    "1500",
+                    "--sock-path",
+                    "/dev/null",
+                    "--loglevel",
+                    "4",
+                    "--enable-udprelay"}
 }

@@ -1,7 +1,6 @@
 pb:
 	  go get -u github.com/golang/protobuf/protoc-gen-go
 		@echo "pb Start"
-		cd configure && make pb
 asset:
 	mkdir assets
 	cd assets;curl https://raw.githubusercontent.com/v2ray/v2ray-core/master/release/config/geosite.dat > geosite.dat

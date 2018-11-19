@@ -4,7 +4,6 @@ import (
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
-	"github.com/2dust/AndroidLibV2rayLite/configure"
 
 	"golang.org/x/sys/unix"
 
@@ -14,14 +13,9 @@ import (
 /*VpnSupportReady VpnSupportReady*/
 func (v *VPNSupport) VpnSupportReady() {
 	if !v.status.VpnSupportnodup {
-		/*
-			v.VpnSupportnodup = true
-			//Surpress Network Interruption Notifiction
-			go func() {
-				time.Sleep(5 * time.Second)
-				v.VpnSupportnodup = false
-			}()*/
-		v.VpnSupportSet.Setup(v.Conf.Service.VPNSetupArg)
+		
+		VPNSetupArg := "m,1500 a,26.26.26.1,24 r,0.0.0.0,0"
+		v.VpnSupportSet.Setup(VPNSetupArg)
 		v.setV2RayDialer()
 		v.startVPNRequire()
 	}
@@ -30,7 +24,7 @@ func (v *VPNSupport) startVPNRequire() {
 	v.Estr = Escort.NewEscort()
 	v.Estr.SetStatus(v.status)
 	v.Estr.EscortingUPV()
-	go v.Estr.EscortRun(v.Conf.Service.Target, v.Conf.Service.Args, false, v.VpnSupportSet.GetVPNFd())	
+	go v.Estr.EscortRun(v.status.GetTun2socks(), v.status.GetTun2socksArgs(), false, v.VpnSupportSet.GetVPNFd())	
 }
 
 func (v *VPNSupport) askSupportSetInit() {
@@ -38,11 +32,8 @@ func (v *VPNSupport) askSupportSetInit() {
 }
 
 func (v *VPNSupport) VpnSetup() {
-	if v.Conf.Service.VPNSetupArg != "" {
 		v.prepareDomainName()
-
 		v.askSupportSetInit()
-	}
 }
 func (v *VPNSupport) VpnShutdown() {
 
@@ -60,7 +51,7 @@ func (v *VPNSupport) VpnShutdown() {
 		println(err)
 		//}
 		v.VpnSupportSet.Shutdown()
-		v.Estr.EscortingDown()
+		 
 	}
 	v.status.VpnSupportnodup = false
 }
@@ -74,7 +65,6 @@ type VPNSupport struct {
 	prepareddomain           preparedDomain
 	VpnSupportSet            V2RayVPNServiceSupportsSet
 	status                   *CoreI.Status
-	Conf                     configure.VPNConfig
 	Estr                     *Escort.Escorting
 }
 

@@ -19,8 +19,6 @@ import (
 	"github.com/2dust/AndroidLibV2rayLite/Process"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
-	"github.com/2dust/AndroidLibV2rayLite/configure"
-	"github.com/2dust/AndroidLibV2rayLite/configure/jsonConvert"
 	"github.com/2dust/AndroidLibV2rayLite/shippedBinarys"
 	vlencoding "github.com/xiaokangwang/V2RayConfigureFileUtil/encoding"
 	mobasset "golang.org/x/mobile/asset"
@@ -40,9 +38,6 @@ in protobuf format.
 */
 type V2RayPoint struct {
 	status          *CoreI.Status
-	confng          *configure.LibV2RayConf
-	EnvCreater      Process.EnvironmentCreater
-	escorter        *Escort.Escorting
 	Callbacks       V2RayCallbacks
 	v2rayOP         *sync.Mutex
 	Context         *V2RayContext
@@ -72,30 +67,15 @@ func (v *V2RayPoint) pointloop() {
 	if strings.HasPrefix(v.ConfigureFile, "V2Ray_internal") {
 		if v.ConfigureFile == "V2Ray_internal/ConfigureFileContent" {
 			//Convert is needed
-			jc := &jsonConvert.JsonToPbConverter{}
-			jc.Datadir = v.status.PackageName
+			//jc := &jsonConvert.JsonToPbConverter{}
+			//jc.Datadir = v.status.PackageName
 			//Load File From Context
 			//cf := v.Context.GetConfigureFile()
-			jc.LoadFromString(v.ConfigureFileContent)
-			jc.Parse()
-			v.confng = jc.ToPb()
+			//jc.LoadFromString(v.ConfigureFileContent)
+			//jc.Parse()
+			//v.confng = jc.ToPb()
 			configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
 			config = *configx
-		} else {
-			buf := []byte(v.ConfigureFileContent)
-			err := proto.Unmarshal(buf, &config)
-			if err != nil {
-				log.Println(err)
-			}
-			//Assert V2RayPart
-			for _, a := range config.GetExtension() {
-				d, _ := a.GetInstance()
-				switch vn := d.(type) {
-				case *configure.LibV2RayConf:
-					v.confng = vn
-				default:
-				}
-			}
 		}
 	}
 	var err error
@@ -139,9 +119,8 @@ func (v *V2RayPoint) pointloop() {
 	vPoint.Start()
 	v.vpoint = vPoint
 	*/
-	if v.confng != nil {
-		v.escorter.Configure = v.confng.RootModeConf.Escorting
-		v.escorter.EscortingUP()
+	
+		 
 
 		/* TODO:RunVPN Escort
 		log.Trace(errors.New("v.escortingUP()"))
@@ -162,7 +141,7 @@ func (v *V2RayPoint) pointloop() {
 		/* TODO: setup VPN
 		v.vpnSetup()
 		*/
-	}
+	
 	v.Callbacks.OnEmitStatus(0, "Running")
 	//v.parseCfgDone()
 }
@@ -185,15 +164,12 @@ func (v *V2RayPoint) RunLoop() {
 func (v *V2RayPoint) stopLoopW() {
 	v.status.IsRunning = false
 	v.status.Vpoint.Close()
-	if v.confng != nil {
-		v.VPNSupports.VpnShutdown()
-		v.escorter.EscortingDown()
-		/* TODO: Escort Down
-			log.Trace(errors.New("v.escortingDown()"))
-			v.escortingDown()
-		}
-		*/
+	v.VPNSupports.VpnShutdown()
+	/* TODO: Escort Down
+		log.Trace(errors.New("v.escortingDown()"))
+		v.escortingDown()
 	}
+	*/
 	v.Callbacks.OnEmitStatus(0, "Closed")
 
 }

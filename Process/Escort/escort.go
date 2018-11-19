@@ -6,7 +6,6 @@ import (
 
 	"log"
 )
-import "github.com/2dust/AndroidLibV2rayLite/configure"
 import "github.com/2dust/AndroidLibV2rayLite/CoreI"
 import "github.com/2dust/AndroidLibV2rayLite/Process"
 
@@ -16,12 +15,7 @@ func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd 
 		cmd := exec.Command(proc, pt...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		ect := Process.EnvironmentCreater{Conf: v.Env, Context: v.status}
-		env := ect.GetEnvironment()
-		env = append(env, os.Environ()...)
-		env = ect.AddEnvironment(env)
-		cmd.Env = env
-
+		
 		if tapfd != 0 {
 			file := os.NewFile(uintptr(tapfd), "/dev/tap0")
 			var files []*os.File
@@ -76,40 +70,7 @@ func (v *Escorting) unforgivenessCloser() {
 		}
 	}
 	log.Println("unforgivenessCloser() quit")
-}
-
-func (v *Escorting) EscortingUP() {
-	if v.escortProcess != nil {
-		return
-	}
-	v.escortProcess = new([](*os.Process))
-	go v.unforgivenessCloser()
-	for _, esct := range v.Configure {
-		v.escortBeg(esct.Target, esct.Args, esct.Forgiveable)
-	}
-}
-func (v *Escorting) EscortingUPV() {
-	if v.escortProcess != nil {
-		return
-	}
-	v.escortProcess = new([](*os.Process))
-	go v.unforgivenessCloser()
-}
-func (v *Escorting) EscortingDown() {
-	log.Println("escortingDown() Killing all escorted process ")
-	if v.escortProcess == nil {
-		return
-	}
-	for _, pr := range *v.escortProcess {
-		pr.Kill()
-	}
-	log.Println("escortingDown() v.unforgivnesschan <- 0")
-	select {
-	case v.unforgivnesschan <- 0:
-	}
-	v.escortProcess = nil
-
-}
+} 
 
 func (v *Escorting) SetStatus(st *CoreI.Status) {
 	v.status = st
@@ -123,6 +84,4 @@ type Escorting struct {
 	escortProcess    *[](*os.Process)
 	unforgivnesschan chan int
 	status           *CoreI.Status
-	Configure        []*configure.EscortedProcess
-	Env              *configure.EnvironmentVar
 }

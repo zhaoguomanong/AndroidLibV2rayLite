@@ -18,7 +18,7 @@ func (v *VPNSupport) prepareDomainName() {
 	}
 	v.prepareddomain.tcpprepared = make(map[string](*net.TCPAddr))
 	v.prepareddomain.udpprepared = make(map[string](*net.UDPAddr))
-	for _, domainName := range v.status.GetDomainNameList {
+	for _, domainName := range v.status.GetDomainNameList() {
 		log.Println("Preparing DNS,", domainName)
 		var err error
 		v.prepareddomain.tcpprepared[domainName], err = net.ResolveTCPAddr("tcp4", domainName)

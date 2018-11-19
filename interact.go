@@ -14,7 +14,6 @@ import (
 	"v2ray.com/ext/sysio"
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
-	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
 	"github.com/2dust/AndroidLibV2rayLite/shippedBinarys"
 	mobasset "golang.org/x/mobile/asset"

@@ -3,7 +3,6 @@ package VPN
 import (
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
-	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 
 	"golang.org/x/sys/unix"
 

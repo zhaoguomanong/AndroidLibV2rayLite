@@ -49,7 +49,7 @@ func (v *Status) GetTun2socksArgs() []string {
 
 func (v *Status) GetDomainNameList() []string {
 	var dynaArr []string
-	if s != "" {
+	if v.DomainName != "" {
 		dynaArr = append(dynaArr, v.DomainName)
 	}	
 	return dynaArr

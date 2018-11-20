@@ -16,6 +16,7 @@ import (
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
 	"github.com/2dust/AndroidLibV2rayLite/shippedBinarys"
+	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 	mobasset "golang.org/x/mobile/asset"
 	v2rayconf "v2ray.com/ext/tools/conf/serial"
 )

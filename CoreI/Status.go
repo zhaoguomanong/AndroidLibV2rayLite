@@ -8,8 +8,13 @@ type Status struct {
 	IsRunning       bool
 	VpnSupportnodup bool
 	PackageName     string
+	DomainName     string
 
 	Vpoint core.Server
+}
+
+func CheckVersion() int {
+	return 3
 }
 
 func (v *Status) GetDataDir() string {
@@ -43,6 +48,10 @@ func (v *Status) GetTun2socksArgs() []string {
 }
 
 func (v *Status) GetDomainNameList() []string {
-	return []string{"google.com","google.com"}
+	var dynaArr []string
+	if s != "" {
+		dynaArr = append(dynaArr, v.DomainName)
+	}	
+	return dynaArr
 }
 

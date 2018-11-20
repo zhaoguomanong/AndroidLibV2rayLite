@@ -31,8 +31,11 @@ func (vc *V2RayContext) CheckConfigureFile() bool {
 }
 
 func (vc *V2RayContext) SetPackageName(PackageName string) {
-	//Check if file exist
 	vc.Status.PackageName = PackageName
+}
+
+func (vc *V2RayContext) SetDomainName(DomainName string) {
+	vc.Status.DomainName = DomainName
 }
 
 func exists(path string) bool {

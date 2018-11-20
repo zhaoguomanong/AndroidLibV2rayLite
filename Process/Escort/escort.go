@@ -71,6 +71,30 @@ func (v *Escorting) unforgivenessCloser() {
 	log.Println("unforgivenessCloser() quit")
 } 
 
+
+func (v *Escorting) EscortingUPV() {
+	if v.escortProcess != nil {
+		return
+	}
+	v.escortProcess = new([](*os.Process))
+	go v.unforgivenessCloser()
+}
+
+func (v *Escorting) EscortingDown() {
+	log.Println("escortingDown() Killing all escorted process ")
+	if v.escortProcess == nil {
+		return
+	}
+	for _, pr := range *v.escortProcess {
+		pr.Kill()
+	}
+	log.Println("escortingDown() v.unforgivnesschan <- 0")
+	select {
+	case v.unforgivnesschan <- 0:
+	}
+	v.escortProcess = nil
+}
+
 func (v *Escorting) SetStatus(st *CoreI.Status) {
 	v.status = st
 }

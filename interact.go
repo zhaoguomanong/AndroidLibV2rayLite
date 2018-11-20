@@ -150,13 +150,9 @@ func (v *V2RayPoint) RunLoop() {
 
 func (v *V2RayPoint) stopLoopW() {
 	v.status.IsRunning = false
-	v.status.Vpoint.Close()
+	v.status.Vpoint.Close()	 
 	v.VPNSupports.VpnShutdown()
-	/* TODO: Escort Down
-		log.Trace(errors.New("v.escortingDown()"))
-		v.escortingDown()
-	}
-	*/
+	v.escorter.EscortingDown()	
 	v.Callbacks.OnEmitStatus(0, "Closed")
 
 }

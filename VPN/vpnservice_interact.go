@@ -23,6 +23,7 @@ func (v *VPNSupport) VpnSupportReady() {
 func (v *VPNSupport) startVPNRequire() {
 	v.Estr = Escort.NewEscort()
 	v.Estr.SetStatus(v.status)
+	v.Estr.EscortingUPV()
 	go v.Estr.EscortRun(v.status.GetTun2socks(), v.status.GetTun2socksArgs(), false, v.VpnSupportSet.GetVPNFd())	
 }
 

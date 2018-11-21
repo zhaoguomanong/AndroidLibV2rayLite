@@ -47,6 +47,13 @@ func (v *Status) GetTun2socksArgs() []string {
                     "--enable-udprelay"}
 }
 
+func (v *Status) GetOvertureArgs() []string {
+	var dynaArr []string
+	dynaArr = append(dynaArr, " -c  " + v.PackageName + "config.json")
+	
+	return dynaArr
+}
+
 func (v *Status) GetDomainNameList() []string {
 	var dynaArr []string
 	if v.DomainName != "" {

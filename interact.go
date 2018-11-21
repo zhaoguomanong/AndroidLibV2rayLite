@@ -35,7 +35,6 @@ type V2RayPoint struct {
 	escorter        *Escort.Escorting
 	Callbacks       V2RayCallbacks
 	v2rayOP         *sync.Mutex
-	Context         *V2RayContext
 	VPNSupports     *VPN.VPNSupport
 	interuptDeferto int64
 
@@ -104,11 +103,8 @@ func (v *V2RayPoint) pointloop() {
 func (v *V2RayPoint) RunLoop() {
 	v.v2rayOP.Lock()
 	//Construct Context
-	if v.Context == nil {
-		v.Context = new(V2RayContext)
 		v.status.PackageName = v.PackageName
 		v.status.DomainName = v.DomainName
-	}
 	if !v.status.IsRunning {
 		go v.pointloop()
 	}
@@ -160,16 +156,6 @@ func NewV2RayPoint() *V2RayPoint {
 	//panic("Creating VPoint")
 	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}}
 } 
-
-/*
-Client can opt-in V2Ray's Next Generation Interface
-*/
-func (v *V2RayPoint) UpgradeToContext() {
-	if v.Context == nil {
-		v.Context = new(V2RayContext)
-		v.Context.Status = v.status
-	}
-}
 
 func (v *V2RayPoint) GetIsRunning() bool {
 	return v.status.IsRunning

@@ -41,6 +41,7 @@ type V2RayPoint struct {
 
 	//Legacy prop, should use Context instead
 	PackageName          string
+	DomainName		     string
 	ConfigureFile        string
 	ConfigureFileContent string
 }
@@ -106,6 +107,7 @@ func (v *V2RayPoint) RunLoop() {
 	if v.Context == nil {
 		v.Context = new(V2RayContext)
 		v.status.PackageName = v.PackageName
+		v.status.DomainName = v.DomainName
 	}
 	if !v.status.IsRunning {
 		go v.pointloop()

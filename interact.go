@@ -1,13 +1,11 @@
 package libv2ray
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"v2ray.com/core"

@@ -24,7 +24,7 @@ func (v *VPNSupport) startVPNRequire() {
 	v.Estr.SetStatus(v.status)
 	v.Estr.EscortingUPV()
 	go v.Estr.EscortRun(v.status.GetApp("tun2socks"), v.status.GetTun2socksArgs(), false, v.VpnSupportSet.GetVPNFd())	
-	go v.Estr.EscortRun(v.status.GetApp("overture"), new []string, false, v.VpnSupportSet.GetVPNFd())	
+	go v.Estr.EscortRun(v.status.GetApp("overture"), []string{}, false, v.VpnSupportSet.GetVPNFd())	
 }
 
 func (v *VPNSupport) askSupportSetInit() {

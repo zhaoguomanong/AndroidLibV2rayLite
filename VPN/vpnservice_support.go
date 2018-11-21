@@ -1,13 +1,6 @@
 package VPN
 
 import (
-	"errors"
-	"log"
-	"net"
-	"os"
-	"strings"
-
-	"golang.org/x/sys/unix"
 )
 import "github.com/davecgh/go-spew/spew"
 
@@ -15,6 +8,7 @@ type vpnProtectedDialer struct {
 	vp *VPNSupport
 }
 
+/*
 func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, error) {
 	if strings.HasPrefix(network, "tcp") {
 
@@ -139,3 +133,4 @@ func zoneToInt(zone string) int {
 	n, _, _ := dtoi(zone, 0)
 	return n
 }
+*/

@@ -1,9 +1,5 @@
 package VPN
 
-import (
-)
-import "github.com/davecgh/go-spew/spew"
-
 type vpnProtectedDialer struct {
 	vp *VPNSupport
 }

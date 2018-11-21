@@ -25,8 +25,8 @@ func (v *Status) getDataDir() string {
 	return v.PackageName
 }
 
-func (v *Status) GetTun2socks() string {
-	return v.PackageName + "tun2socks"
+func (v *Status) GetApp(name string) string {
+	return v.PackageName + name
 }
 
 func (v *Status) GetTun2socksArgs() []string {

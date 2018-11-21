@@ -54,30 +54,16 @@ type V2RayCallbacks interface {
 }
 
 func (v *V2RayPoint) pointloop() {
-	//v.setupSoftCrashMonitor()
-
 	v.status.VpnSupportnodup = false
 
 	//TODO:Parse Configure File
-	//Deal with legacy API
+	log.Println("loading v2ray config")
 	var config core.Config
-	if strings.HasPrefix(v.ConfigureFile, "V2Ray_internal") {
-		if v.ConfigureFile == "V2Ray_internal/ConfigureFileContent" {
-			//Convert is needed
-			//jc := &jsonConvert.JsonToPbConverter{}
-			//jc.Datadir = v.status.PackageName
-			//Load File From Context
-			//cf := v.Context.GetConfigureFile()
-			//jc.LoadFromString(v.ConfigureFileContent)
-			//jc.Parse()
-			//v.confng = jc.ToPb()
-			configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
-			config = *configx
-		}
-	}
+	configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
+	config = *configx
+	
 	var err error
 	//TODO:Load Shipped Binary
-
 	shipb := shippedBinarys.FirstRun{}
 	shipb.SetCoreI(v.status)
 	err = shipb.CheckAndExport()
@@ -85,52 +71,33 @@ func (v *V2RayPoint) pointloop() {
 		log.Println(err)
 	}
 
+	//New Start V2Ray Core
+	log.Println("new v2ray core")
 	v.status.Vpoint, err = core.New(&config)
 	if err != nil {
 		log.Println("VPoint Start Err:" + err.Error())
 
 	}
-	/* TODO: Start V2Ray Core
-	vPoint, err := core.New(config)
-	if err != nil {
-		log.Trace(errors.New("Failed to create Point server").Base(err))
-
-		v.Callbacks.OnEmitStatus(-1, "Failed to create Point server ("+err.Error()+")")
-
-		return
-	}*/
-
+	
+	log.Println("start v2ray core")
 	v.status.IsRunning = true
 	v.status.Vpoint.Start()
-	/*log.Trace(errors.New("vPoint.Start()"))
-	vPoint.Start()
-	v.vpoint = vPoint
-	*/
+
+	v.interuptDeferto = 1
 	
-		 
+	go func() {
+		time.Sleep(5 * time.Second)
+		v.interuptDeferto = 0
+	}()
+	//Set Necessary Props First
 
-		/* TODO:RunVPN Escort
-		log.Trace(errors.New("v.escortingUP()"))
-		v.escortingUP()
-		*/
-		//Now, surpress interrupt signal for 5 sec
-
-		v.interuptDeferto = 1
-
-		go func() {
-			time.Sleep(5 * time.Second)
-			v.interuptDeferto = 0
-		}()
-		//Set Necessary Props First
-		
-		v.VPNSupports.SetStatus(v.status)
-		v.VPNSupports.VpnSetup()
-		/* TODO: setup VPN
-		v.vpnSetup()
-		*/
 	
+	log.Println("run vpn apps")
+
+	v.VPNSupports.SetStatus(v.status)
+	v.VPNSupports.VpnSetup()
+ 	
 	v.Callbacks.OnEmitStatus(0, "Running")
-	//v.parseCfgDone()
 }
 
 /*RunLoop Run V2Ray main loop
@@ -192,36 +159,7 @@ func NewV2RayPoint() *V2RayPoint {
 	//platform.ForceReevaluate()
 	//panic("Creating VPoint")
 	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}}
-}
-
-/*NetworkInterrupted inform us to restart the v2ray,
-closing dead connections.
-*/
-func (v *V2RayPoint) NetworkInterrupted() {
-	/*
-		Behavior Changed in API Ver 23
-		From now, we will defer the start for 3 sec,
-		any Interruption Message will be surpressed during this period
-	*/
-	go func() {
-		if v.status.IsRunning {
-			//Calc sleep time
-			defer func() {
-				if r := recover(); r != nil {
-					fmt.Println("Your device might not support atomic operation", r)
-				}
-			}()
-			succ := atomic.CompareAndSwapInt64(&v.interuptDeferto, 0, 1)
-			if succ {
-				v.status.Vpoint.Close()
-				time.Sleep(2 * time.Second)
-				v.status.Vpoint.Start()
-				atomic.StoreInt64(&v.interuptDeferto, 0)
-			} else {
-			}
-		}
-	}()
-}
+} 
 
 /*
 Client can opt-in V2Ray's Next Generation Interface

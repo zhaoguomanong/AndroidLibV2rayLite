@@ -12,8 +12,7 @@ import (
 
 /*VpnSupportReady VpnSupportReady*/
 func (v *VPNSupport) VpnSupportReady() {
-	if !v.status.VpnSupportnodup {
-		
+	if !v.status.VpnSupportnodup {		
 		VPNSetupArg := "m,1500 a,26.26.26.1,24 r,0.0.0.0,0"
 		v.VpnSupportSet.Setup(VPNSetupArg)
 		v.setV2RayDialer()
@@ -24,7 +23,8 @@ func (v *VPNSupport) startVPNRequire() {
 	v.Estr = Escort.NewEscort()
 	v.Estr.SetStatus(v.status)
 	v.Estr.EscortingUPV()
-	go v.Estr.EscortRun(v.status.GetTun2socks(), v.status.GetTun2socksArgs(), false, v.VpnSupportSet.GetVPNFd())	
+	go v.Estr.EscortRun(v.status.GetApp("tun2socks"), v.status.GetTun2socksArgs(), false, v.VpnSupportSet.GetVPNFd())	
+	go v.Estr.EscortRun(v.status.GetApp("overture"), new []string, false, v.VpnSupportSet.GetVPNFd())	
 }
 
 func (v *VPNSupport) askSupportSetInit() {
@@ -36,14 +36,11 @@ func (v *VPNSupport) VpnSetup() {
 		v.askSupportSetInit()
 }
 func (v *VPNSupport) VpnShutdown() {	
-
 	//if v.VpnSupportnodup {
 	err := unix.Close(v.VpnSupportSet.GetVPNFd())
 	println(err)
 	//}
 	v.VpnSupportSet.Shutdown()
-		
-
 	v.status.VpnSupportnodup = false
 }
 

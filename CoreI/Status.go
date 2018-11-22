@@ -14,7 +14,7 @@ type Status struct {
 }
 
 func CheckVersion() int {
-	return 3
+	return 4
 }
 
 func (v *Status) GetDataDir() string {
@@ -27,6 +27,9 @@ func (v *Status) getDataDir() string {
 
 func (v *Status) GetApp(name string) string {
 	return v.PackageName + name
+}
+
+	return v.PackageName + name +  " -c " + v.PackageName + "config.json"
 }
 
 func (v *Status) GetTun2socksArgs() []string {
@@ -49,7 +52,7 @@ func (v *Status) GetTun2socksArgs() []string {
 
 func (v *Status) GetOvertureArgs() []string {
 	var dynaArr []string
-	dynaArr = append(dynaArr, " -c  " + v.PackageName + "config.json")
+	dynaArr = append(dynaArr, " -c " + v.PackageName + "config.json")
 	
 	return dynaArr
 }

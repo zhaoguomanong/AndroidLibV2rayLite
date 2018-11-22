@@ -9,6 +9,8 @@ import (
 import "github.com/2dust/AndroidLibV2rayLite/CoreI"
 
 func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd int) {
+	log.Println(proc)
+	log.Println(pt)
 	count := 42
 	for count > 0 {
 		cmd := exec.Command(proc, pt...)
@@ -22,8 +24,7 @@ func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd 
 		}
 
 		err := cmd.Start()
-		log.Println(proc)
-		log.Println(pt)
+		
 		if err != nil {
 			log.Println(err)
 		}

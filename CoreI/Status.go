@@ -14,7 +14,7 @@ type Status struct {
 }
 
 func CheckVersion() int {
-	return 4
+	return 5
 }
 
 func (v *Status) GetDataDir() string {

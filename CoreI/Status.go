@@ -29,6 +29,7 @@ func (v *Status) GetApp(name string) string {
 	return v.PackageName + name
 }
 
+func (v *Status) GetApp2(name string) string {
 	return v.PackageName + name +  " -c " + v.PackageName + "config.json"
 }
 

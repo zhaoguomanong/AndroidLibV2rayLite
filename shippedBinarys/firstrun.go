@@ -1,7 +1,7 @@
 package shippedBinarys
 
-import (
-	"fmt"
+import (	
+	"log"
 	"os"
 	"strconv"
 
@@ -14,13 +14,14 @@ type FirstRun struct {
 
 func (v *FirstRun) checkIfRcExist() error {
 	datadir := v.status.GetDataDir()
+	log.Println(datadir)
 
 	if _, err := os.Stat(datadir + strconv.Itoa(CoreI.CheckVersion())); !os.IsNotExist(err) {
-		fmt.Println(err)
+		log.Println(err)
 		return nil
 	}
 	IndepDir, err := AssetDir("ArchIndep")
-	fmt.Print(IndepDir)
+	log.Println(IndepDir)
 	if err != nil {
 		return err
 	}
@@ -28,8 +29,8 @@ func (v *FirstRun) checkIfRcExist() error {
 		err := RestoreAsset(datadir, "ArchIndep/"+fn)
 		//GrantPremission
 		os.Chmod(datadir+"ArchIndep/"+fn, 0700)
-		fmt.Println(os.Symlink(datadir+"ArchIndep/"+fn, datadir+fn))
-		fmt.Print(err)
+		log.Println(os.Symlink(datadir+"ArchIndep/"+fn, datadir+fn))
+		log.Println(err)
 	}
 	DepDir, err := AssetDir("ArchDep")
 	if err != nil {

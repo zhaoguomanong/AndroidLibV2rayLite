@@ -52,10 +52,12 @@ func (v *Status) GetTun2socksArgs() []string {
 }
 
 func (v *Status) GetOvertureArgs() []string {
-	var dynaArr []string
-	dynaArr = append(dynaArr, " -c /data/user/0/com.v2ray.ang/ArchDep/arm64/config.json")
+	//var dynaArr []string
+	//dynaArr = append(dynaArr, " -c /data/user/0/com.v2ray.ang/ArchDep/arm64/config.json")
 	
-	return dynaArr
+	//return dynaArr
+	return []string{"-c",
+                    "/data/user/0/com.v2ray.ang/ArchDep/arm64/config.json"}
 }
 
 func (v *Status) GetDomainNameList() []string {

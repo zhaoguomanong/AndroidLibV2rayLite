@@ -14,7 +14,7 @@ type Status struct {
 }
 
 func CheckVersion() int {
-	return 9
+	return 10
 }
 
 func (v *Status) GetDataDir() string {
@@ -27,10 +27,6 @@ func (v *Status) getDataDir() string {
 
 func (v *Status) GetApp(name string) string {
 	return v.PackageName + name
-}
-
-func (v *Status) GetApp2(name string) string {
-	return "/data/user/0/com.v2ray.ang/ArchDep/arm64/overture"
 }
 
 func (v *Status) GetTun2socksArgs() []string {
@@ -52,12 +48,11 @@ func (v *Status) GetTun2socksArgs() []string {
 }
 
 func (v *Status) GetOvertureArgs() []string {
-	//var dynaArr []string
-	//dynaArr = append(dynaArr, " -c /data/user/0/com.v2ray.ang/ArchDep/arm64/config.json")
+	var dynaArr []string
+	dynaArr = append(dynaArr, "-c")
+	dynaArr = append(dynaArr, v.PackageName + "config.json")
 	
-	//return dynaArr
-	return []string{"-c",
-                    "/data/user/0/com.v2ray.ang/ArchDep/arm64/config.json"}
+	return dynaArr
 }
 
 func (v *Status) GetDomainNameList() []string {

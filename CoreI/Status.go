@@ -51,6 +51,8 @@ func (v *Status) GetOvertureArgs() []string {
 	var dynaArr []string
 	dynaArr = append(dynaArr, "-c")
 	dynaArr = append(dynaArr, v.PackageName + "config.json")
+	dynaArr = append(dynaArr, "-l")
+	dynaArr = append(dynaArr, v.PackageName + "overture.log")
 	
 	return dynaArr
 }

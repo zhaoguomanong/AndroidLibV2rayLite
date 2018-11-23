@@ -1,5 +1,5 @@
 {
-  "BindAddress": ":53",
+  "BindAddress": ":5353",
   "PrimaryDNS": [
     {
       "Name": "DNSPod",

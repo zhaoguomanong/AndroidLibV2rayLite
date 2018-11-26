@@ -24,7 +24,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		addr, haveaddr := sDialer.vp.prepareddomain.tcpprepared[Address]
 
 		if haveaddr == false {
-			log.Println("Using ResolveTCPAddr tcp")
+			log.Println("Using ResolveTCPAddr: TCP,", Address)
 			addr, err = net.ResolveTCPAddr(network, Address)
 		} else {
 			log.Println("Using Prepared Domain Name: TCP,", Address)
@@ -71,7 +71,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		addr, haveaddr := sDialer.vp.prepareddomain.udpprepared[Address]
 
 		if haveaddr == false {
-			log.Println("Using ResolveTCPAddr udp")
+			log.Println("Using ResolveTCPAddr: UDP,", Address)
 			addr, err = net.ResolveUDPAddr(network, Address)
 		} else {
 			log.Println("Using Prepared Domain Name: UDP,", Address)

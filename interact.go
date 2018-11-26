@@ -10,7 +10,6 @@ import (
 
 	"v2ray.com/core"
 	"v2ray.com/ext/sysio"
-
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/VPN"
 	"github.com/2dust/AndroidLibV2rayLite/shippedBinarys"
@@ -21,14 +20,6 @@ import (
 
 /*V2RayPoint V2Ray Point Server
 This is territory of Go, so no getter and setters!
-
-Notice:
-ConfigureFile can be either the path of config file or
-"V2Ray_internal/ConfigureFileContent" in case you wish to
-provide configure file with @[ConfigureFileContent] in JSON
-format or "V2Ray_internal/AsPbConfigureFileContent"
-in protobuf format.
-
 */
 type V2RayPoint struct {
 	status          *CoreI.Status
@@ -41,8 +32,17 @@ type V2RayPoint struct {
 	//Legacy prop, should use Context instead
 	PackageName          string
 	DomainName		     string
-	ConfigureFile        string
 	ConfigureFileContent string
+}
+
+
+/*V2RayVPNServiceSupportsSet To support Android VPN mode*/
+type V2RayVPNServiceSupportsSet interface {
+	GetVPNFd() int
+	Setup(Conf string) int
+	Prepare() int
+	Shutdown() int
+	Protect(int) int
 }
 
 /*V2RayCallbacks a Callback set for V2Ray
@@ -51,74 +51,20 @@ type V2RayCallbacks interface {
 	OnEmitStatus(int, string) int
 }
 
-func (v *V2RayPoint) pointloop() {
-	v.status.VpnSupportnodup = false
-
-	//TODO:Parse Configure File
-	log.Println("loading v2ray config")
-	var config core.Config
-	configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
-	config = *configx
-	
-	var err error
-	//TODO:Load Shipped Binary
-	shipb := shippedBinarys.FirstRun{}
-	shipb.SetCoreI(v.status)
-	err = shipb.CheckAndExport()
-	if err != nil {
-		log.Println(err)
-	}
-
-	//New Start V2Ray Core
-	log.Println("new v2ray core")
-	v.status.Vpoint, err = core.New(&config)
-	if err != nil {
-		log.Println("VPoint Start Err:" + err.Error())
-
-	}
-	
-	log.Println("start v2ray core")
-	v.status.IsRunning = true
-	v.status.Vpoint.Start()
-
-	v.interuptDeferto = 1
-	
-	go func() {
-		time.Sleep(5 * time.Second)
-		v.interuptDeferto = 0
-	}()
-	//Set Necessary Props First
-
-	
-	log.Println("run vpn apps")
-
-	v.VPNSupports.SetStatus(v.status)
-	v.VPNSupports.VpnSetup()
- 	
-	v.Callbacks.OnEmitStatus(0, "Running")
-}
-
 /*RunLoop Run V2Ray main loop
  */
 func (v *V2RayPoint) RunLoop() {
 	v.v2rayOP.Lock()
 	//Construct Context
-		v.status.PackageName = v.PackageName
-		v.status.DomainName = v.DomainName
+	v.status.PackageName = v.PackageName
+	v.status.DomainName = v.DomainName
+	
 	if !v.status.IsRunning {
 		go v.pointloop()
 	}
 	v.v2rayOP.Unlock()
 }
 
-func (v *V2RayPoint) stopLoopW() {
-	v.status.IsRunning = false
-	v.status.Vpoint.Close()	 
-	v.VPNSupports.VpnShutdown()
-	v.escorter.EscortingDown()	
-	v.Callbacks.OnEmitStatus(0, "Closed")
-
-}
 
 /*StopLoop Stop V2Ray main loop
  */
@@ -161,15 +107,6 @@ func (v *V2RayPoint) GetIsRunning() bool {
 	return v.status.IsRunning
 }
 
-/*V2RayVPNServiceSupportsSet To support Android VPN mode*/
-type V2RayVPNServiceSupportsSet interface {
-	GetVPNFd() int
-	Setup(Conf string) int
-	Prepare() int
-	Shutdown() int
-	Protect(int) int
-}
-
 //Delegate Funcation
 func (v *V2RayPoint) VpnSupportReady() {
 	v.VPNSupports.VpnSupportReady()
@@ -178,4 +115,59 @@ func (v *V2RayPoint) VpnSupportReady() {
 //Delegate Funcation
 func (v *V2RayPoint) SetVpnSupportSet(vs V2RayVPNServiceSupportsSet) {
 	v.VPNSupports.VpnSupportSet = vs
+}
+
+func (v *V2RayPoint) pointloop() {
+	v.status.VpnSupportnodup = false
+
+	//TODO:Parse Configure File
+	log.Println("loading v2ray config")
+	var config core.Config
+	configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
+	config = *configx
+	
+	var err error
+	//TODO:Load Shipped Binary
+	shipb := shippedBinarys.FirstRun{}
+	shipb.SetCoreI(v.status)
+	err = shipb.CheckAndExport()
+	if err != nil {
+		log.Println(err)
+	}
+
+	//New Start V2Ray Core
+	log.Println("new v2ray core")
+	v.status.Vpoint, err = core.New(&config)
+	if err != nil {
+		log.Println("VPoint Start Err:" + err.Error())
+
+	}
+	
+	log.Println("start v2ray core")
+	v.status.IsRunning = true
+	v.status.Vpoint.Start()
+
+	v.interuptDeferto = 1
+	
+	go func() {
+		time.Sleep(5 * time.Second)
+		v.interuptDeferto = 0
+	}()
+	//Set Necessary Props First
+	
+	log.Println("run vpn apps")
+
+	v.VPNSupports.SetStatus(v.status)
+	v.VPNSupports.VpnSetup()
+ 	
+	v.Callbacks.OnEmitStatus(0, "Running")
+}
+
+func (v *V2RayPoint) stopLoopW() {
+	v.status.IsRunning = false
+	v.status.Vpoint.Close()	 
+	v.VPNSupports.VpnShutdown()
+	v.escorter.EscortingDown()	
+	v.Callbacks.OnEmitStatus(0, "Closed")
+
 }

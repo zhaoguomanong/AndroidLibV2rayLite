@@ -24,6 +24,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		addr, haveaddr := sDialer.vp.prepareddomain.tcpprepared[Address]
 
 		if haveaddr == false {
+			log.Println("Using ResolveTCPAddr tcp")
 			addr, err = net.ResolveTCPAddr(network, Address)
 		} else {
 			log.Println("Using Prepared Domain Name: TCP,", Address)
@@ -38,7 +39,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		}
 
 		//Protect socket fd!
-		log.Println("Protecting Sock:", fd)
+		//log.Println("Protecting Sock:", fd)
 		sDialer.vp.VpnSupportSet.Protect(fd)
 
 		sa := new(unix.SockaddrInet6)
@@ -70,6 +71,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		addr, haveaddr := sDialer.vp.prepareddomain.udpprepared[Address]
 
 		if haveaddr == false {
+			log.Println("Using ResolveTCPAddr udp")
 			addr, err = net.ResolveUDPAddr(network, Address)
 		} else {
 			log.Println("Using Prepared Domain Name: UDP,", Address)
@@ -84,7 +86,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		}
 
 		//Protect socket fd!
-		log.Println("Protecting Sock:", fd)
+		//log.Println("Protecting Sock:", fd)
 		sDialer.vp.VpnSupportSet.Protect(fd)
 
 		sa := new(unix.SockaddrInet6)

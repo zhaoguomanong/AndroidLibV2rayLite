@@ -112,6 +112,10 @@ func (v *V2RayPoint) VpnSupportReady() {
 	v.VPNSupports.VpnSupportReady()
 }
 
+func (v *V2RayPoint) LoadLocalDns() {
+	v.VPNSupports.LoadLocalDns()
+}
+
 //Delegate Funcation
 func (v *V2RayPoint) SetVpnSupportSet(vs V2RayVPNServiceSupportsSet) {
 	v.VPNSupports.VpnSupportSet = vs

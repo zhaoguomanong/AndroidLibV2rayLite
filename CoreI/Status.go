@@ -18,10 +18,6 @@ func CheckVersion() int {
 }
 
 func (v *Status) GetDataDir() string {
-	return v.getDataDir()
-}
-
-func (v *Status) getDataDir() string {
 	return v.PackageName
 }
 
@@ -29,7 +25,7 @@ func (v *Status) GetApp(name string) string {
 	return v.PackageName + name
 }
 
-func (v *Status) GetTun2socksArgs() []string {
+func (v *Status) GetTun2socksArgs(fd int) []string {
 	return []string{"--netif-ipaddr",
                     "26.26.26.2",
                     "--netif-netmask",
@@ -37,7 +33,7 @@ func (v *Status) GetTun2socksArgs() []string {
                     "--socks-server-addr",
                     "127.0.0.1:10808",
                     "--tunfd",
-                    "3",
+					strconv.Itoa(fd),
                     "--tunmtu",
                     "1500",
                     "--sock-path",

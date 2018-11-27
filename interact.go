@@ -161,7 +161,7 @@ func (v *V2RayPoint) pointloop() {
 	
 	log.Println("run vpn apps")
 
-	v.VPNSupports.SetStatus(v.status)
+	v.VPNSupports.SetStatus(v.status, v.escorter)
 	v.VPNSupports.VpnSetup()
  	
 	v.Callbacks.OnEmitStatus(0, "Running")

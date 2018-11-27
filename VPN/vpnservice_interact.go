@@ -22,8 +22,9 @@ type V2RayVPNServiceSupportsSet interface {
 	Protect(int) int
 }
 
-func (v *VPNSupport) SetStatus(st *CoreI.Status) {
+func (v *VPNSupport) SetStatus(st *CoreI.Status, estr *Escort.Escorting) {
 	v.status = st
+	v.Estr = estr
 }
 
 func (v *VPNSupport) VpnSetup() {
@@ -51,7 +52,7 @@ func (v *VPNSupport) VpnShutdown() {
 
 func (v *VPNSupport) LoadLocalDns() {
 	if !v.status.VpnSupportnodup {	
-		v.Estr = v.escorter
+		//v.Estr = Escort.NewEscort()
 		v.Estr.SetStatus(v.status)
 		v.Estr.EscortingUPV()
 		go v.Estr.EscortRun(v.status.GetApp("overture"), v.status.GetOvertureArgs(), false, 0)		
@@ -59,7 +60,7 @@ func (v *VPNSupport) LoadLocalDns() {
 }
 
 func (v *VPNSupport) startVPNRequire() {
-	v.Estr = v.escorter
+	//v.Estr = Escort.NewEscort()
 	v.Estr.SetStatus(v.status)
 	v.Estr.EscortingUPV()
 	go v.Estr.EscortRun(v.status.GetApp("tun2socks"), v.status.GetTun2socksArgs(v.VpnSupportSet.GetVPNFd()), false, v.VpnSupportSet.GetVPNFd())	

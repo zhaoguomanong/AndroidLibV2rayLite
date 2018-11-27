@@ -64,4 +64,9 @@ func (v *Status) GetDomainNameList() []string {
 	}	
 	return dynaArr
 }
+func (v *Status) GetVPNSetupArg() string {
+	return "m,1500 a,26.26.26.1,24 r,0.0.0.0,0"
+}
+
+
 

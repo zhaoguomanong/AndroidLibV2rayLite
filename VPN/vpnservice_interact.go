@@ -33,9 +33,8 @@ func (v *VPNSupport) VpnSetup() {
 
 /*VpnSupportReady VpnSupportReady*/
 func (v *VPNSupport) VpnSupportReady() {
-	if !v.status.VpnSupportnodup {		
-		VPNSetupArg := "m,1500 a,26.26.26.1,24 r,0.0.0.0,0"
-		v.VpnSupportSet.Setup(VPNSetupArg)
+	if !v.status.VpnSupportnodup {
+		v.VpnSupportSet.Setup(v.status.GetVPNSetupArg())
 		v.setV2RayDialer()
 		v.startVPNRequire()
 	}

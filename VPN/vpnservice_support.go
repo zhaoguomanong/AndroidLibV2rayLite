@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/sys/unix"
 )
-import "github.com/davecgh/go-spew/spew"
+//import "github.com/davecgh/go-spew/spew"
 
 type vpnProtectedDialer struct {
 	vp *VPNSupport
@@ -24,10 +24,10 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		addr, haveaddr := sDialer.vp.prepareddomain.tcpprepared[Address]
 
 		if haveaddr == false {
-			log.Println("Using ResolveTCPAddr: TCP,", Address)
+			log.Println("Not Using Prepared: TCP,", Address)
 			addr, err = net.ResolveTCPAddr(network, Address)
 		} else {
-			log.Println("Using Prepared Domain Name: TCP,", Address)
+			log.Println("Using Prepared: TCP,", Address)
 		}
 
 		if err != nil {
@@ -43,7 +43,7 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		sDialer.vp.VpnSupportSet.Protect(fd)
 
 		sa := new(unix.SockaddrInet6)
-		spew.Dump(addr, sDialer.vp.prepareddomain.tcpprepared)
+		//spew.Dump(addr, sDialer.vp.prepareddomain.tcpprepared)
 		sa.Port = addr.Port
 		sa.ZoneId = uint32(zoneToInt(addr.Zone))
 		//fmt.Println(addr.IP.To16())

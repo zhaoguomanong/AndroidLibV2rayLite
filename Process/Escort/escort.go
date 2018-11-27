@@ -29,9 +29,9 @@ func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd 
 			log.Println(err)
 		}
 		*v.escortProcess = append(*v.escortProcess, cmd.Process)
-		log.Println("Waiting....")
+		log.Println("EscortRun Waiting....")
 		err = cmd.Wait()
-		log.Println("Exit")
+		log.Println("EscortRun Exit")
 		log.Println(err)
 		if v.status.IsRunning {
 			log.Println("Unexpected Exit")

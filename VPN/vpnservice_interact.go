@@ -51,7 +51,7 @@ func (v *VPNSupport) VpnShutdown() {
 
 func (v *VPNSupport) LoadLocalDns() {
 	if !v.status.VpnSupportnodup {	
-		v.Estr = Escort.NewEscort()
+		v.Estr = v.escorter
 		v.Estr.SetStatus(v.status)
 		v.Estr.EscortingUPV()
 		go v.Estr.EscortRun(v.status.GetApp("overture"), v.status.GetOvertureArgs(), false, 0)		
@@ -59,7 +59,7 @@ func (v *VPNSupport) LoadLocalDns() {
 }
 
 func (v *VPNSupport) startVPNRequire() {
-	v.Estr = Escort.NewEscort()
+	v.Estr = v.escorter
 	v.Estr.SetStatus(v.status)
 	v.Estr.EscortingUPV()
 	go v.Estr.EscortRun(v.status.GetApp("tun2socks"), v.status.GetTun2socksArgs(v.VpnSupportSet.GetVPNFd()), false, v.VpnSupportSet.GetVPNFd())	

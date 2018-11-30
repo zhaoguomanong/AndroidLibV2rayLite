@@ -4,9 +4,8 @@
 # Execute this script in your home directory. Lines 17 and 21 will prompt you for a y/n
 
 # Install Oracle JDK 8
-add-apt-repository ppa:webupd8team/java
 apt-get update
-apt-get install -y oracle-java8-installer
+apt-get install -y openjdk-8-jdk
 apt-get install -y unzip make expect # NDK stuff
 
 # Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)

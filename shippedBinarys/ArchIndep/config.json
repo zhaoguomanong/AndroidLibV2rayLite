@@ -1,5 +1,5 @@
 {
-  "BindAddress": ":53",
+  "BindAddress": ":8053",
   "PrimaryDNS": [
     {
       "Name": "DNSPod",
@@ -8,8 +8,9 @@
       "SOCKS5Address": "",
       "Timeout": 6,
       "EDNSClientSubnet": {
-        "Policy": "disable",
-        "ExternalIP": ""
+        "Policy": "auto",
+        "ExternalIP": "",
+        "NoCookie": true
       }
     }
   ],
@@ -22,7 +23,8 @@
       "Timeout": 6,
       "EDNSClientSubnet": {
         "Policy": "disable",
-        "ExternalIP": ""
+        "ExternalIP": "",
+        "NoCookie": true
       }
     }
   ],

@@ -15,7 +15,7 @@ type Status struct {
 }
 
 func CheckVersion() int {
-	return 10
+	return 11
 }
 
 func (v *Status) GetDataDir() string {
@@ -40,7 +40,7 @@ func (v *Status) GetTun2socksArgs(fd int) []string {
                     "--sock-path",
                     "/dev/null",
                     "--loglevel",
-                    "4",
+                    "1",
                     "--enable-udprelay"}
 }
 

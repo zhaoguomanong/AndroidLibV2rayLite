@@ -1,4 +1,4 @@
-package tun2socks
+package libv2ray
 
 import (
 	"context"

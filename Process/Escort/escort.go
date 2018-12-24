@@ -8,7 +8,7 @@ import (
 )
 import "github.com/2dust/AndroidLibV2rayLite/CoreI"
 
-func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd int) {
+func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd int, additionalEnv string) {
 	log.Println(proc)
 	log.Println(pt)
 	count := 42
@@ -16,6 +16,12 @@ func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd 
 		cmd := exec.Command(proc, pt...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
+		
+		if len(additionalEnv) > 0 {
+			//additionalEnv := "FOO=bar"
+			newEnv := append(os.Environ(), additionalEnv))
+			cmd.Env = newEnv
+		}
 		
 		if tapfd != 0 {
 			file := os.NewFile(uintptr(tapfd), "/dev/tap0")

@@ -19,7 +19,7 @@ func (v *FirstRun) checkIfRcExist() error {
 		return nil
 	}
 	
-	/*
+	
 	IndepDir, err := AssetDir("ArchIndep")
 	log.Println(IndepDir)
 	if err != nil {
@@ -33,7 +33,8 @@ func (v *FirstRun) checkIfRcExist() error {
 		//GrantPremission
 		os.Chmod(datadir+"ArchIndep/"+fn, 0700)
 		log.Println(os.Symlink(datadir+"ArchIndep/"+fn, datadir+fn))			
-	}*/
+	}
+	
 	
 	DepDir, err := AssetDir("ArchDep")
 	log.Println(DepDir)

@@ -30,9 +30,11 @@ func (v *FirstRun) checkIfRcExist() error {
 		
 		err := RestoreAsset(datadir, "ArchIndep/"+fn)
 		log.Println(err)
+		
 		//GrantPremission
 		os.Chmod(datadir+"ArchIndep/"+fn, 0700)
-		log.Println(os.Symlink(datadir+"ArchIndep/"+fn, datadir+fn))			
+		log.Println(os.Remove(datadir + fn))	
+		log.Println(os.Symlink(datadir+"ArchIndep/"+fn, datadir + fn))			
 	}
 	
 	
@@ -52,6 +54,7 @@ func (v *FirstRun) checkIfRcExist() error {
 			
 			RestoreAsset(datadir, "ArchDep/"+fn+"/"+FND)
 			os.Chmod(datadir+"ArchDep/"+fn+"/"+FND, 0700)
+			log.Println(os.Remove(datadir + FND))	
 			log.Println(os.Symlink(datadir+"ArchDep/"+fn+"/"+FND, datadir+FND))			
 		}
 	}

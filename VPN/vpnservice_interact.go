@@ -55,7 +55,7 @@ func (v *VPNSupport) VpnShutdown() {
 func (v *VPNSupport) LoadLocalDns(cont string) {
 	if !v.status.VpnSupportnodup {	
 	
-		ioutil.WriteFile(v.Status.GetDataDir() + "config.json", []byte(cont), 0700)
+		ioutil.WriteFile(v.status.GetDataDir() + "config.json", []byte(cont), 0700)
 	
 		//v.Estr = Escort.NewEscort()
 		v.Estr.SetStatus(v.status)

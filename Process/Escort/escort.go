@@ -19,7 +19,7 @@ func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, tapfd 
 		
 		if len(additionalEnv) > 0 {
 			//additionalEnv := "FOO=bar"
-			newEnv := append(os.Environ(), additionalEnv))
+			newEnv := append(os.Environ(), additionalEnv)
 			cmd.Env = newEnv
 		}
 		

@@ -51,14 +51,14 @@
     "OnlyPrimaryDNS":false,
     "IPv6UseAlternativeDNS":false,
     "IPNetworkFile":{
-        "Primary":"${datadir}ip_network_primary",
-        "Alternative":"${datadir}ip_network_alternative"
+        "Primary":"ip_network_primary",
+        "Alternative":"ip_network_alternative"
     },
     "DomainFile":{
-        "Primary":"${datadir}domain_primary",
-        "Alternative":"${datadir}domain_alternative"
+        "Primary":"domain_primary",
+        "Alternative":"domain_alternative"
     },
-    "HostsFile":"${datadir}hosts",
+    "HostsFile":"hosts",
     "MinimumTTL":120,
     "CacheSize":0,
     "RejectQtype":[

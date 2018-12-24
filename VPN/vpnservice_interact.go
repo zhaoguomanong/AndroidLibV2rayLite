@@ -53,15 +53,13 @@ func (v *VPNSupport) VpnShutdown() {
 }
 
 func (v *VPNSupport) LoadLocalDns(cont string) {
-	if !v.status.VpnSupportnodup {	
-	
+	if !v.status.VpnSupportnodup {
 		ioutil.WriteFile(v.status.GetDataDir() + "config.json", []byte(cont), 0700)
 	
 		//v.Estr = Escort.NewEscort()
 		v.Estr.SetStatus(v.status)
-		v.Estr.EscortingUPV()
-		datadir := v.status.GetDataDir()	
-		go v.Estr.EscortRun(v.status.GetApp("overture"), v.status.GetOvertureArgs(), false, 0, "datadir="+datadir)		
+		v.Estr.EscortingUPV()	
+		go v.Estr.EscortRun(v.status.GetApp("overture"), v.status.GetOvertureArgs(), false, 0, "")		
 	}
 }
 

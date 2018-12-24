@@ -112,8 +112,8 @@ func (v *V2RayPoint) VpnSupportReady() {
 	v.VPNSupports.VpnSupportReady()
 }
 
-func (v *V2RayPoint) LoadLocalDns() {
-	v.VPNSupports.LoadLocalDns()
+func (v *V2RayPoint) LoadLocalDns(cont string) {
+	v.VPNSupports.LoadLocalDns(cont)
 }
 
 //Delegate Funcation

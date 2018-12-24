@@ -1,6 +1,8 @@
 package VPN
 
 import (
+	"io/ioutil"
+	
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
 	"golang.org/x/sys/unix"
@@ -50,8 +52,11 @@ func (v *VPNSupport) VpnShutdown() {
 	v.status.VpnSupportnodup = false
 }
 
-func (v *VPNSupport) LoadLocalDns() {
+func (v *VPNSupport) LoadLocalDns(cont string) {
 	if !v.status.VpnSupportnodup {	
+	
+		ioutil.WriteFile(v.Status.GetDataDir() + "config.json", []byte(cont), 0700)
+	
 		//v.Estr = Escort.NewEscort()
 		v.Estr.SetStatus(v.status)
 		v.Estr.EscortingUPV()

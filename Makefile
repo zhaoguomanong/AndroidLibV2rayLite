@@ -3,8 +3,8 @@ pb:
 		@echo "pb Start"
 asset:
 	mkdir assets
-	cd assets;curl https://raw.githubusercontent.com/v2ray/v2ray-core/master/release/config/geosite.dat > geosite.dat
-	cd assets;curl https://raw.githubusercontent.com/v2ray/v2ray-core/master/release/config/geoip.dat > geoip.dat
+	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geosite.dat > geosite.dat
+	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geoip.dat > geoip.dat
 
 shippedBinary:
 	cd shippedBinarys; $(MAKE) shippedBinary

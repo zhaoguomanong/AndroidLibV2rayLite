@@ -16,6 +16,8 @@ import (
 	"v2ray.com/core"
 	"v2ray.com/ext/sysio"
 	v2rayconf "v2ray.com/ext/tools/conf/serial"
+
+	"v2ray.com/core/features/stats"
 )
 
 /*V2RayPoint V2Ray Point Server
@@ -29,10 +31,16 @@ type V2RayPoint struct {
 	VPNSupports     *VPN.VPNSupport
 	interuptDeferto int64
 
+	StatsManager stats.Manager
 	//Legacy prop, should use Context instead
 	PackageName          string
 	DomainName           string
 	ConfigureFileContent string
+}
+
+type V2RayStat struct {
+	Up   int64
+	Down int64
 }
 
 /*V2RayVPNServiceSupportsSet To support Android VPN mode*/
@@ -115,6 +123,20 @@ func (v *V2RayPoint) SetVpnSupportSet(vs V2RayVPNServiceSupportsSet) {
 	v.VPNSupports.VpnSupportSet = vs
 }
 
+//Delegate Funcation
+func (v *V2RayPoint) QueryStats() *V2RayStat {
+	stat := &V2RayStat{Up: 0, Down: 0}
+	up := v.StatsManager.GetCounter("inbound>>>socks>>>traffic>>>uplink")
+	down := v.StatsManager.GetCounter("inbound>>>socks>>>traffic>>>downlink")
+	if up != nil {
+		stat.Up = up.Value()
+	}
+	if down != nil {
+		stat.Down = down.Value()
+	}
+	return stat
+}
+
 func (v *V2RayPoint) pointloop() {
 	v.status.VpnSupportnodup = false
 
@@ -135,11 +157,13 @@ func (v *V2RayPoint) pointloop() {
 
 	//New Start V2Ray Core
 	log.Println("new v2ray core")
-	v.status.Vpoint, err = core.New(&config)
-	if err != nil {
-		log.Println("VPoint Start Err:" + err.Error())
+	inst, verr := core.New(&config)
+	if verr != nil {
+		log.Println("VPoint Start Err:" + verr.Error())
 
 	}
+	v.status.Vpoint = inst
+	v.StatsManager = inst.GetFeature(stats.ManagerType()).(stats.Manager)
 
 	log.Println("start v2ray core")
 	v.status.IsRunning = true

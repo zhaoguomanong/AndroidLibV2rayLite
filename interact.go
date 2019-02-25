@@ -1,6 +1,7 @@
 package libv2ray
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -36,11 +37,6 @@ type V2RayPoint struct {
 	PackageName          string
 	DomainName           string
 	ConfigureFileContent string
-}
-
-type V2RayStat struct {
-	Up   int64
-	Down int64
 }
 
 /*V2RayVPNServiceSupportsSet To support Android VPN mode*/
@@ -124,17 +120,13 @@ func (v *V2RayPoint) SetVpnSupportSet(vs V2RayVPNServiceSupportsSet) {
 }
 
 //Delegate Funcation
-func (v *V2RayPoint) QueryStats() *V2RayStat {
-	stat := &V2RayStat{Up: 0, Down: 0}
-	up := v.StatsManager.GetCounter("inbound>>>socks>>>traffic>>>uplink")
-	down := v.StatsManager.GetCounter("inbound>>>socks>>>traffic>>>downlink")
-	if up != nil {
-		stat.Up = up.Value()
+func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
+	query := fmt.Sprintf("inbound>>>%s>>>traffic>>>%s", tag, direct)
+	counter := v.StatsManager.GetCounter(query)
+	if counter != nil {
+		return counter.Value()
 	}
-	if down != nil {
-		stat.Down = down.Value()
-	}
-	return stat
+	return 0
 }
 
 func (v *V2RayPoint) pointloop() {

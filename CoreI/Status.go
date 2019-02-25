@@ -43,7 +43,7 @@ func (v *Status) GetTun2socksArgs(fd int) []string {
 		"--loglevel",
 		"1",
 		"--netif-ip6addr",
-		"fe80:2626::2",
+		"fd26:2626::2",
 		"--enable-udprelay"}
 }
 
@@ -56,5 +56,5 @@ func (v *Status) GetDomainNameList() []string {
 }
 
 func (v *Status) GetVPNSetupArg() string {
-	return "m,1500 a,26.26.26.1,30 a,fe80:2626::1,126 r,0.0.0.0,0 r,::,0 d,26.26.26.2"
+	return "m,1500 a,26.26.26.1,30 a,fd26:2626::1,126 r,0.0.0.0,0 r,::,0 d,26.26.26.2"
 }

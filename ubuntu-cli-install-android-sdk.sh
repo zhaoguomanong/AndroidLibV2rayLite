@@ -9,12 +9,12 @@ apt-get install -y openjdk-8-jdk
 apt-get install -y unzip make expect # NDK stuff
 
 # Get SDK tools (link from https://developer.android.com/studio/index.html#downloads)
-wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+wget -q https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 mkdir android-sdk-linux
 unzip sdk*.zip -d android-sdk-linux
 
 # Get NDK (https://developer.android.com/ndk/downloads/index.html)
-wget https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip
+wget -q https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip
 unzip android-ndk*.zip >> /dev/null
 
 ACCEPT_LICENSES_URL=https://gist.githubusercontent.com/xiaokangwang/1489fd223d26581bfec92adb3cb0088e/raw/328eb6925099df5aae3e76790f8232f0fc378f8b/accept-licenses

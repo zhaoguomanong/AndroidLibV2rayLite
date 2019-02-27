@@ -14,8 +14,8 @@ mkdir android-sdk-linux
 unzip sdk*.zip -d android-sdk-linux
 
 # Get NDK (https://developer.android.com/ndk/downloads/index.html)
-wget -q https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip
-unzip android-ndk*.zip >> /dev/null
+# wget -q https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip
+# unzip android-ndk*.zip >> /dev/null
 
 ACCEPT_LICENSES_URL=https://gist.githubusercontent.com/xiaokangwang/1489fd223d26581bfec92adb3cb0088e/raw/328eb6925099df5aae3e76790f8232f0fc378f8b/accept-licenses
 
@@ -62,12 +62,13 @@ yes|./sdkmanager --verbose "${filenames[@]}" |awk -f reduce.awk
 # ./android update sdk --no-ui --all --filter 1,2,3,<...>,N
 # where N is the number of the package in the list (see previous command)
 
+./sdkmanager "ndk-bundle"
 
 # Add the directory containing executables in PATH so that they can be found
 echo 'export ANDROID_HOME=$HOME/android-sdk-linux' >> ~/.bashrc
 echo 'export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools' >> ~/.bashrc
-echo 'export NDK_HOME=$HOME/android-ndk-r15c' >> ~/.bashrc
-echo 'export ANDROID_NDK_HOME=$NDK_HOME' >> ~/.bashrc
+# echo 'export NDK_HOME=$HOME/android-ndk-r15c' >> ~/.bashrc
+# echo 'export ANDROID_NDK_HOME=$NDK_HOME' >> ~/.bashrc
 
 
 source ~/.bashrc

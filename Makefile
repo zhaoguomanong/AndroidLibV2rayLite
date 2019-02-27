@@ -23,7 +23,7 @@ downloadGoMobile:
 	cd ~ ;curl -L https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/ubuntu-cli-install-android-sdk.sh | sudo bash - > /dev/null
 	ls ~
 	ls ~/android-sdk-linux/
-	gomobile init -ndk ~/android-ndk-r15c;gomobile bind -v  -tags json github.com/2dust/AndroidLibV2rayLite
+	gomobile init ;gomobile bind -v  -tags json github.com/2dust/AndroidLibV2rayLite
 
 BuildMobile:
 	@echo Stub

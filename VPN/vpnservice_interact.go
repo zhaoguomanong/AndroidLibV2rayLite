@@ -33,11 +33,11 @@ func (v *VPNSupport) VpnSetup() {
 }
 
 /*VpnSupportReady VpnSupportReady*/
-func (v *VPNSupport) VpnSupportReady() {
+func (v *VPNSupport) VpnSupportReady(localDNS bool, enableIPv6 bool) {
 	if !v.status.VpnSupportnodup {
-		v.VpnSupportSet.Setup(v.status.GetVPNSetupArg())
+		v.VpnSupportSet.Setup(v.status.GetVPNSetupArg(localDNS, enableIPv6))
 		v.setV2RayDialer()
-		v.startVPNRequire()
+		v.startVPNRequire(localDNS, enableIPv6)
 	}
 }
 
@@ -50,11 +50,16 @@ func (v *VPNSupport) VpnShutdown() {
 	v.status.VpnSupportnodup = false
 }
 
-func (v *VPNSupport) startVPNRequire() {
+func (v *VPNSupport) startVPNRequire(localDNS bool, enableIPv6 bool) {
 	//v.Estr = Escort.NewEscort()
 	v.Estr.SetStatus(v.status)
 	v.Estr.EscortingUPV()
-	go v.Estr.EscortRun(v.status.GetApp("tun2socks"), v.status.GetTun2socksArgs(v.VpnSupportSet.GetVPNFd()), false, v.VpnSupportSet.GetVPNFd(), "")
+	go v.Estr.EscortRun(
+		v.status.GetApp("tun2socks"),
+		v.status.GetTun2socksArgs(v.VpnSupportSet.GetVPNFd(), localDNS, enableIPv6),
+		false,
+		v.VpnSupportSet.GetVPNFd(),
+		"")
 }
 
 func (v *VPNSupport) askSupportSetInit() {

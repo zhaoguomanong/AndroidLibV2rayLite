@@ -110,8 +110,8 @@ func (v *V2RayPoint) GetIsRunning() bool {
 }
 
 //Delegate Funcation
-func (v *V2RayPoint) VpnSupportReady() {
-	v.VPNSupports.VpnSupportReady()
+func (v *V2RayPoint) VpnSupportReady(localDNS bool, enableIPv6 bool) {
+	v.VPNSupports.VpnSupportReady(localDNS, enableIPv6)
 }
 
 //Delegate Funcation

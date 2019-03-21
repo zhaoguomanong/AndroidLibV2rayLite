@@ -46,10 +46,6 @@ func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, additi
 
 }
 
-func (v *Escorting) escortBeg(proc string, pt []string, forgiveable bool) {
-	go v.EscortRun(proc, pt, forgiveable, 0, "")
-}
-
 func (v *Escorting) unforgivenessCloser() {
 	log.Println("unforgivenessCloser() <-v.unforgivnesschan")
 	<-v.unforgivnesschan

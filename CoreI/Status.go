@@ -39,7 +39,7 @@ func (v *Status) GetTun2socksArgs(fd int, localDNS bool, enableIPv6 bool) (ret [
 		"--tunmtu",
 		"1500",
 		"--loglevel",
-		"1",
+		"info",
 		"--enable-udprelay"}
 
 	if enableIPv6 {

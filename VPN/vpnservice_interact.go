@@ -58,7 +58,6 @@ func (v *VPNSupport) startVPNRequire(localDNS bool, enableIPv6 bool) {
 		v.status.GetApp("tun2socks"),
 		v.status.GetTun2socksArgs(v.VpnSupportSet.GetVPNFd(), localDNS, enableIPv6),
 		false,
-		v.VpnSupportSet.GetVPNFd(),
 		"")
 }
 

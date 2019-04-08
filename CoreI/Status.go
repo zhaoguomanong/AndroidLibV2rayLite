@@ -7,10 +7,9 @@ import (
 )
 
 type Status struct {
-	IsRunning       bool
-	VpnSupportnodup bool
-	PackageName     string
-	DomainName      string
+	IsRunning   bool
+	PackageName string
+	DomainName  string
 
 	Vpoint core.Server
 }

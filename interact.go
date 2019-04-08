@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
@@ -19,6 +18,11 @@ import (
 	v2rayconf "v2ray.com/ext/tools/conf/serial"
 
 	"v2ray.com/core/features/stats"
+)
+
+const (
+	v2Assert    = "v2ray.location.asset"
+	assetperfix = "/dev/libv2rayfs0/asset"
 )
 
 /*V2RayPoint V2Ray Point Server
@@ -56,37 +60,37 @@ type V2RayCallbacks interface {
 
 /*RunLoop Run V2Ray main loop
  */
-func (v *V2RayPoint) RunLoop() {
+func (v *V2RayPoint) RunLoop() (err error) {
 	v.v2rayOP.Lock()
 	//Construct Context
 	v.status.PackageName = v.PackageName
 	v.status.DomainName = v.DomainName
 
 	if !v.status.IsRunning {
-		go v.pointloop()
+		err = v.pointloop()
 	}
 	v.v2rayOP.Unlock()
+	return
 }
 
 /*StopLoop Stop V2Ray main loop
  */
-func (v *V2RayPoint) StopLoop() {
+func (v *V2RayPoint) StopLoop() (err error) {
 	v.v2rayOP.Lock()
 	if v.status.IsRunning {
-		/* TODO: Shutdown VPN
-		v.vpnShutdown()
-		*/
-		go v.stopLoopW()
+		err = v.stopLoopW()
 	}
 	v.v2rayOP.Unlock()
+	return
 }
 
-/*NewV2RayPoint new V2RayPoint*/
-func NewV2RayPoint() *V2RayPoint {
+func initV2Env() {
+	if os.Getenv(v2Assert) != "" {
+		return
+	}
 	//Initialize asset API, Since Raymond Will not let notify the asset location inside Process,
 	//We need to set location outside V2Ray
-	const assetperfix = "/dev/libv2rayfs0/asset"
-	os.Setenv("v2ray.location.asset", assetperfix)
+	os.Setenv(v2Assert, assetperfix)
 	//Now we handle read
 	sysio.NewFileReader = func(path string) (io.ReadCloser, error) {
 		if strings.HasPrefix(path, assetperfix) {
@@ -100,9 +104,24 @@ func NewV2RayPoint() *V2RayPoint {
 		}
 		return os.Open(path)
 	}
-	//platform.ForceReevaluate()
-	//panic("Creating VPoint")
-	return &V2RayPoint{v2rayOP: new(sync.Mutex), status: &CoreI.Status{}, escorter: Escort.NewEscort(), VPNSupports: &VPN.VPNSupport{}}
+}
+
+//Delegate Funcation
+func TestConfig(ConfigureFileContent string) error {
+	initV2Env()
+	_, err := v2rayconf.LoadJSONConfig(strings.NewReader(ConfigureFileContent))
+	return err
+}
+
+/*NewV2RayPoint new V2RayPoint*/
+func NewV2RayPoint() *V2RayPoint {
+	initV2Env()
+	return &V2RayPoint{
+		v2rayOP:     new(sync.Mutex),
+		status:      &CoreI.Status{},
+		escorter:    Escort.NewEscort(),
+		VPNSupports: &VPN.VPNSupport{},
+	}
 }
 
 func (v *V2RayPoint) GetIsRunning() bool {
@@ -129,59 +148,59 @@ func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
 	return 0
 }
 
-func (v *V2RayPoint) pointloop() {
-	v.status.VpnSupportnodup = false
+func (v *V2RayPoint) pointloop() error {
 
 	//TODO:Parse Configure File
 	log.Println("loading v2ray config")
-	var config core.Config
-	configx, _ := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
-	config = *configx
+	config, err := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
-	var err error
 	//TODO:Load Shipped Binary
 	shipb := shippedBinarys.FirstRun{}
 	shipb.SetCoreI(v.status)
-	err = shipb.CheckAndExport()
-	if err != nil {
+	if err := shipb.CheckAndExport(); err != nil {
 		log.Println(err)
+		return err
 	}
 
 	//New Start V2Ray Core
 	log.Println("new v2ray core")
-	inst, verr := core.New(&config)
-	if verr != nil {
-		log.Println("VPoint Start Err:" + verr.Error())
-
+	inst, err := core.New(config)
+	if err != nil {
+		log.Println(err)
+		return err
 	}
+
 	v.status.Vpoint = inst
 	v.StatsManager = inst.GetFeature(stats.ManagerType()).(stats.Manager)
 
 	log.Println("start v2ray core")
 	v.status.IsRunning = true
-	v.status.Vpoint.Start()
+	if err := v.status.Vpoint.Start(); err != nil {
+		v.status.IsRunning = false
+		log.Println(err)
+		return err
+	}
 
-	v.interuptDeferto = 1
-
-	go func() {
-		time.Sleep(5 * time.Second)
-		v.interuptDeferto = 0
-	}()
 	//Set Necessary Props First
-
 	log.Println("run vpn apps")
 
 	v.VPNSupports.SetStatus(v.status, v.escorter)
 	v.VPNSupports.VpnSetup()
 
 	v.Callbacks.OnEmitStatus(0, "Running")
+
+	return nil
 }
 
-func (v *V2RayPoint) stopLoopW() {
+func (v *V2RayPoint) stopLoopW() (err error) {
 	v.status.IsRunning = false
-	v.status.Vpoint.Close()
-	v.VPNSupports.VpnShutdown()
+	err = v.status.Vpoint.Close()
 	v.escorter.EscortingDown()
+	v.VPNSupports.VpnShutdown()
 	v.Callbacks.OnEmitStatus(0, "Closed")
-
+	return
 }

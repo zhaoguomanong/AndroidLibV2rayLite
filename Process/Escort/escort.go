@@ -8,7 +8,7 @@ import (
 )
 import "github.com/2dust/AndroidLibV2rayLite/CoreI"
 
-func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, additionalEnv string) {
+func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
 	log.Println(proc)
 	log.Println(pt)
 	count := 42
@@ -23,48 +23,26 @@ func (v *Escorting) EscortRun(proc string, pt []string, forgiveable bool, additi
 			cmd.Env = newEnv
 		}
 
-		err := cmd.Start()
-		if err != nil {
-			log.Println(err)
+		if err := cmd.Start(); err != nil {
+			log.Println("EscortRun cmd.Start err", err)
+			goto CMDERROR
 		}
+
 		*v.escortProcess = append(*v.escortProcess, cmd.Process)
 		log.Println("EscortRun Waiting....")
-		err = cmd.Wait()
-		log.Println("EscortRun Exit")
-		log.Println(err)
+		if err := cmd.Wait(); err != nil {
+			log.Println("EscortRun cmd.Wait err:", err)
+		}
+
+	CMDERROR:
 		if v.status.IsRunning {
-			log.Println("Unexpected Exit")
+			log.Println("EscortRun Unexpected Exit")
 			count--
 		} else {
-			return
-		}
-	}
-
-	if v.status.IsRunning && !forgiveable {
-		v.unforgivnesschan <- 0
-	}
-
-}
-
-func (v *Escorting) unforgivenessCloser() {
-	log.Println("unforgivenessCloser() <-v.unforgivnesschan")
-	<-v.unforgivnesschan
-	/*if v.status.IsRunning {
-		//TODO:v.caller.StopLoop()
-		log.Println("Closed As unforgivenessCloser decided so.")
-
-	}*/
-	remain := true
-	for remain {
-		select {
-		case <-v.unforgivnesschan:
-			log.Println("unforgivenessCloser() removing reminder unforgivness sign")
+			log.Println("EscortRun Exit")
 			break
-		default:
-			remain = false
 		}
 	}
-	log.Println("unforgivenessCloser() quit")
 }
 
 func (v *Escorting) EscortingUPV() {
@@ -72,7 +50,6 @@ func (v *Escorting) EscortingUPV() {
 		return
 	}
 	v.escortProcess = new([](*os.Process))
-	go v.unforgivenessCloser()
 }
 
 func (v *Escorting) EscortingDown() {
@@ -82,10 +59,7 @@ func (v *Escorting) EscortingDown() {
 	}
 	for _, pr := range *v.escortProcess {
 		pr.Kill()
-	}
-	log.Println("escortingDown() v.unforgivnesschan <- 0")
-	select {
-	case v.unforgivnesschan <- 0:
+		pr.Wait()
 	}
 	v.escortProcess = nil
 }
@@ -95,11 +69,10 @@ func (v *Escorting) SetStatus(st *CoreI.Status) {
 }
 
 func NewEscort() *Escorting {
-	return &Escorting{unforgivnesschan: make(chan int)}
+	return &Escorting{}
 }
 
 type Escorting struct {
-	escortProcess    *[](*os.Process)
-	unforgivnesschan chan int
-	status           *CoreI.Status
+	escortProcess *[](*os.Process)
+	status        *CoreI.Status
 }

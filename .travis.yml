@@ -14,7 +14,6 @@ before_script:
 - make all
 - make downloadGoMobile
 script:
-- go test -p 1 -tags json -v github.com/2dust/AndroidLibV2rayLite/...
 - make BuildMobile
 after_success:
 deploy:

@@ -21,13 +21,17 @@ func (v *VPNSupport) prepareDomainName() {
 	}
 	for _, domainName := range v.status.GetDomainNameList() {
 		log.Println("Preparing DNS,", domainName)
-		var err error
-		v.prepareddomain.tcpprepared[domainName], err = net.ResolveTCPAddr("tcp", domainName)
-		if err != nil {
+		if addr, err := net.ResolveTCPAddr("tcp", domainName); err == nil {
+			log.Println("Prepared %s, %s,", domainName, addr)
+			v.prepareddomain.tcpprepared[domainName] = addr
+		} else {
 			log.Println(err)
 		}
-		v.prepareddomain.udpprepared[domainName], err = net.ResolveUDPAddr("udp", domainName)
-		if err != nil {
+
+		if addr, err := net.ResolveUDPAddr("udp", domainName); err == nil {
+			log.Println("Prepared %s, %s,", domainName, addr)
+			v.prepareddomain.udpprepared[domainName] = addr
+		} else {
 			log.Println(err)
 		}
 	}

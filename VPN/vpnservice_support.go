@@ -2,6 +2,7 @@ package VPN
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -20,18 +21,22 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		var addr *net.TCPAddr
 		var err error
 
-		addr, haveaddr := sDialer.vp.prepareddomain.tcpprepared[Address]
-
-		if haveaddr == false {
+		if _addr, ok := sDialer.vp.prepareddomain.tcpprepared[Address]; ok {
+			addr = _addr
+			log.Println("Using Prepared: TCP,", Address)
+		} else {
 			log.Println("Not Using Prepared: TCP,", Address)
 			addr, err = net.ResolveTCPAddr(network, Address)
-		} else {
-			log.Println("Using Prepared: TCP,", Address)
 		}
 
 		if err != nil {
 			return nil, err
 		}
+
+		if addr == nil {
+			return nil, fmt.Errorf("Fail to resolve address %s/%s", network, Address)
+		}
+
 		fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_STREAM, unix.IPPROTO_TCP)
 		if err != nil {
 			return nil, err
@@ -66,18 +71,22 @@ func (sDialer *vpnProtectedDialer) Dial(network, Address string) (net.Conn, erro
 		var addr *net.UDPAddr
 		var err error
 
-		addr, haveaddr := sDialer.vp.prepareddomain.udpprepared[Address]
-
-		if haveaddr == false {
+		if _addr, ok := sDialer.vp.prepareddomain.udpprepared[Address]; ok {
+			log.Println("Using Prepared: UDP,", Address)
+			addr = _addr
+		} else {
 			log.Println("Not Using Prepared: UDP,", Address)
 			addr, err = net.ResolveUDPAddr(network, Address)
-		} else {
-			log.Println("Using Prepared: UDP,", Address)
 		}
 
 		if err != nil {
 			return nil, err
 		}
+
+		if addr == nil {
+			return nil, fmt.Errorf("Fail to resolve address %s/%s", network, Address)
+		}
+
 		fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, unix.IPPROTO_UDP)
 		if err != nil {
 			return nil, err

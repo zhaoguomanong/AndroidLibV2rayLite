@@ -3,8 +3,7 @@ pb:
 		@echo "pb Start"
 asset:
 	mkdir assets
-	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geosite.dat > geosite.dat
-	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geoip.dat > geoip.dat
+	@echo $(shell ./gen_asserts.sh)
 
 shippedBinary:
 	cd shippedBinarys; $(MAKE) shippedBinary

@@ -10,7 +10,6 @@ import (
 )
 
 type VPNSupport struct {
-	prepareddomain preparedDomain
 	VpnSupportSet  V2RayVPNServiceSupportsSet
 	status         *CoreI.Status
 	Estr           *Escort.Escorting
@@ -30,15 +29,16 @@ func (v *VPNSupport) SetStatus(st *CoreI.Status, estr *Escort.Escorting) {
 }
 
 func (v *VPNSupport) VpnSetup() {
-	v.prepareddomain.Init()
-	go v.prepareDomainName()
 	v.askSupportSetInit()
 }
 
 /*VpnSupportReady VpnSupportReady*/
 func (v *VPNSupport) VpnSupportReady(localDNS bool, enableIPv6 bool) {
 	v.VpnSupportSet.Setup(v.status.GetVPNSetupArg(localDNS, enableIPv6))
-	v.setV2RayDialer()
+	internet.RegisterDialerController(func(network, address string, fd uintptr) error {
+		v.VpnSupportSet.Protect(int(fd))
+		return nil
+	})
 	v.startVPNRequire(localDNS, enableIPv6)
 }
 
@@ -61,9 +61,4 @@ func (v *VPNSupport) startVPNRequire(localDNS bool, enableIPv6 bool) {
 
 func (v *VPNSupport) askSupportSetInit() {
 	v.VpnSupportSet.Prepare()
-}
-
-func (v *VPNSupport) setV2RayDialer() {
-	protectedDialer := &vpnProtectedDialer{vp: v}
-	internet.UseAlternativeSystemDialer(internet.WithAdapter(protectedDialer))
 }

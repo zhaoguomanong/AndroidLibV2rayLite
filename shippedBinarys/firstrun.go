@@ -9,11 +9,11 @@ import (
 )
 
 type FirstRun struct {
-	status *CoreI.Status
+	Status *CoreI.Status
 }
 
 func (v *FirstRun) checkIfRcExist() error {
-	datadir := v.status.GetDataDir()	
+	datadir := v.Status.GetDataDir()
 	if _, err := os.Stat(datadir + strconv.Itoa(CoreI.CheckVersion())); !os.IsNotExist(err) {
 		log.Println("file exists")
 		return nil
@@ -62,10 +62,6 @@ func (v *FirstRun) checkIfRcExist() error {
 	s.Close()
 
 	return nil
-}
-
-func (v *FirstRun) SetCoreI(status *CoreI.Status) {
-	v.status = status
 }
 
 func (v *FirstRun) CheckAndExport() error {

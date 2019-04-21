@@ -52,14 +52,6 @@ func (v *Status) GetTun2socksArgs(fd int, localDNS bool, enableIPv6 bool) (ret [
 	return
 }
 
-func (v *Status) GetDomainNameList() []string {
-	var dynaArr []string
-	if v.DomainName != "" {
-		dynaArr = append(dynaArr, v.DomainName)
-	}
-	return dynaArr
-}
-
 func (v *Status) GetVPNSetupArg(localDNS bool, enableIPv6 bool) (ret string) {
 	ret = "m,1500 a,26.26.26.1,30 r,0.0.0.0,0"
 

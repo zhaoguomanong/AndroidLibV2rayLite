@@ -5,8 +5,8 @@ import (
 	"os/exec"
 
 	"log"
+	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 )
-import "github.com/2dust/AndroidLibV2rayLite/CoreI"
 
 func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
 	log.Println(proc)
@@ -35,7 +35,7 @@ func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
 		}
 
 	CMDERROR:
-		if v.status.IsRunning {
+		if v.Status.IsRunning {
 			log.Println("EscortRun Unexpected Exit")
 			count--
 		} else {
@@ -45,7 +45,7 @@ func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
 	}
 }
 
-func (v *Escorting) EscortingUPV() {
+func (v *Escorting) EscortingUp() {
 	if v.escortProcess != nil {
 		return
 	}
@@ -53,26 +53,21 @@ func (v *Escorting) EscortingUPV() {
 }
 
 func (v *Escorting) EscortingDown() {
-	log.Println("escortingDown() Killing all escorted process ")
 	if v.escortProcess == nil {
 		return
 	}
+
+	log.Println("EscortingDown() Killing all escorted process ")
 	for _, pr := range *v.escortProcess {
 		pr.Kill()
-		pr.Wait()
+		if _, err := pr.Wait(); err != nil {
+			log.Println("EscortingDown pr.Wait err:", err)
+		}
 	}
 	v.escortProcess = nil
 }
 
-func (v *Escorting) SetStatus(st *CoreI.Status) {
-	v.status = st
-}
-
-func NewEscort() *Escorting {
-	return &Escorting{}
-}
-
 type Escorting struct {
 	escortProcess *[](*os.Process)
-	status        *CoreI.Status
+	Status        *CoreI.Status
 }

@@ -2,8 +2,7 @@ pb:
 	  go get -u github.com/golang/protobuf/protoc-gen-go
 		@echo "pb Start"
 asset:
-	mkdir assets
-	@echo $(shell ./gen_asserts.sh)
+	@echo $(shell ./gen_assets.sh)
 
 shippedBinary:
 	cd shippedBinarys; $(MAKE) shippedBinary

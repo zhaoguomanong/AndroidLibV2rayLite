@@ -28,6 +28,11 @@ func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
 			goto CMDERROR
 		}
 
+		if v.escortProcess == nil {
+			log.Println("EscortRun v.escortProcess nil")
+			break
+		}
+
 		*v.escortProcess = append(*v.escortProcess, cmd.Process)
 		log.Println("EscortRun Waiting....")
 		if err := cmd.Wait(); err != nil {

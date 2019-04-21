@@ -13,11 +13,11 @@ import (
 	"github.com/2dust/AndroidLibV2rayLite/shippedBinarys"
 	mobasset "golang.org/x/mobile/asset"
 
-	"v2ray.com/core"
-	"v2ray.com/ext/sysio"
-	"v2ray.com/core/features/stats"
-	"v2ray.com/core/transport/internet"
-	v2rayconf "v2ray.com/ext/tools/conf/serial"
+	v2core          "v2ray.com/core"
+	v2stats         "v2ray.com/core/features/stats"
+	v2internet      "v2ray.com/core/transport/internet"
+	v2filesystem    "v2ray.com/core/common/platform/filesystem"
+	v2serial        "v2ray.com/core/infra/conf/serial"
 )
 
 const (
@@ -31,7 +31,7 @@ This is territory of Go, so no getter and setters!
 type V2RayPoint struct {
 	Callbacks       V2RayCallbacks
 	SupportSet  	V2RayVPNServiceSupportsSet
-	statsManager 	stats.Manager
+	statsManager 	v2stats.Manager
 
 	status          *CoreI.Status
 	escorter        *Escort.Escorting
@@ -92,7 +92,7 @@ func initV2Env() {
 	//We need to set location outside V2Ray
 	os.Setenv(v2Assert, assetperfix)
 	//Now we handle read
-	sysio.NewFileReader = func(path string) (io.ReadCloser, error) {
+	v2filesystem.NewFileReader = func(path string) (io.ReadCloser, error) {
 		if strings.HasPrefix(path, assetperfix) {
 			p := path[len(assetperfix)+1:]
 			//is it overridden?
@@ -109,7 +109,7 @@ func initV2Env() {
 //Delegate Funcation
 func TestConfig(ConfigureFileContent string) error {
 	initV2Env()
-	_, err := v2rayconf.LoadJSONConfig(strings.NewReader(ConfigureFileContent))
+	_, err := v2serial.LoadJSONConfig(strings.NewReader(ConfigureFileContent))
 	return err
 }
 
@@ -162,7 +162,7 @@ func (v *V2RayPoint) pointloop() error {
 
 	//TODO:Parse Configure File
 	log.Println("loading v2ray config")
-	config, err := v2rayconf.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
+	config, err := v2serial.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
 	if err != nil {
 		log.Println(err)
 		return err
@@ -177,7 +177,7 @@ func (v *V2RayPoint) pointloop() error {
 
 	//New Start V2Ray Core
 	log.Println("new v2ray core")
-	inst, err := core.New(config)
+	inst, err := v2core.New(config)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -185,16 +185,17 @@ func (v *V2RayPoint) pointloop() error {
 
 
 	v.status.Vpoint = inst
-	v.statsManager = inst.GetFeature(stats.ManagerType()).(stats.Manager)
+	v.statsManager = inst.GetFeature(v2stats.ManagerType()).(v2stats.Manager)
 
 	// v2ray hooker to protect fd
 	protectfunc := func(network, address string, fd uintptr) error {
 		if ret := v.SupportSet.Protect(int(fd)); ret != 0 {
-			return fmt.ErrorF("protectfunc: fail to protect.")
+			return fmt.Errorf("protectfunc: fail to protect.")
 		}
+		return nil
 	}
-	internet.RegisterDialerController(protectfunc)
-	internet.RegisterListenerController(protectfunc)
+	v2internet.RegisterDialerController(protectfunc)
+	v2internet.RegisterListenerController(protectfunc)
 
 	log.Println("start v2ray core")
 	v.status.IsRunning = true
@@ -211,9 +212,9 @@ func (v *V2RayPoint) pointloop() error {
 }
 
 func (v *V2RayPoint) stopLoopW() (err error) {
-	v.escorter.EscortingDown()
-	v.SupportSet.Shutdown()
 	v.status.IsRunning = false
+	go v.escorter.EscortingDown()
+	v.SupportSet.Shutdown()
 	err = v.status.Vpoint.Close()
 	v.Callbacks.OnEmitStatus(0, "Closed")
 	return

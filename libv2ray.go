@@ -7,7 +7,7 @@ import (
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 
-	"v2ray.com/core"
+	v2core "v2ray.com/core"
 	_ "v2ray.com/core/main/distro/all"
 )
 
@@ -22,5 +22,5 @@ func CheckVersion() int {
 This func will return libv2ray binding version and V2Ray version used.
 */
 func CheckVersionX() string {
-	return fmt.Sprintf("Libv2rayLite V%d, Core V%s", CheckVersion(), core.Version())
+	return fmt.Sprintf("Libv2rayLite V%d, Core V%s", CheckVersion(), v2core.Version())
 }

@@ -3,7 +3,7 @@ package CoreI
 import (
 	"strconv"
 
-	"v2ray.com/core"
+	v2core "v2ray.com/core"
 )
 
 type Status struct {
@@ -11,7 +11,7 @@ type Status struct {
 	PackageName string
 	DomainName  string
 
-	Vpoint core.Server
+	Vpoint v2core.Server
 }
 
 func CheckVersion() int {

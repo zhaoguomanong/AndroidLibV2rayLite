@@ -188,10 +188,13 @@ func (v *V2RayPoint) pointloop() error {
 	v.statsManager = inst.GetFeature(stats.ManagerType()).(stats.Manager)
 
 	// v2ray hooker to protect fd
-	internet.RegisterDialerController(func(network, address string, fd uintptr) error {
-		v.SupportSet.Protect(int(fd))
-		return nil
-	})
+	protectfunc := func(network, address string, fd uintptr) error {
+		if ret := v.SupportSet.Protect(int(fd)); ret != 0 {
+			return fmt.ErrorF("protectfunc: fail to protect.")
+		}
+	}
+	internet.RegisterDialerController(protectfunc)
+	internet.RegisterListenerController(protectfunc)
 
 	log.Println("start v2ray core")
 	v.status.IsRunning = true

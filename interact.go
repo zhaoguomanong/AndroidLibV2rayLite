@@ -30,7 +30,6 @@ const (
 This is territory of Go, so no getter and setters!
 */
 type V2RayPoint struct {
-	Callbacks    V2RayCallbacks
 	SupportSet   V2RayVPNServiceSupportsSet
 	statsManager v2stats.Manager
 
@@ -38,10 +37,10 @@ type V2RayPoint struct {
 	escorter *Escort.Escorting
 	v2rayOP  *sync.Mutex
 
-	//Legacy prop, should use Context instead
 	PackageName          string
-	DomainName           string
 	ConfigureFileContent string
+	EnableLocalDNS       bool
+	ForwardIpv6          bool
 }
 
 /*V2RayVPNServiceSupportsSet To support Android VPN mode*/
@@ -51,11 +50,6 @@ type V2RayVPNServiceSupportsSet interface {
 	Prepare() int
 	Shutdown() int
 	Protect(int) int
-}
-
-/*V2RayCallbacks a Callback set for V2Ray
- */
-type V2RayCallbacks interface {
 	OnEmitStatus(int, string) int
 }
 
@@ -66,7 +60,6 @@ func (v *V2RayPoint) RunLoop() (err error) {
 	defer v.v2rayOP.Unlock()
 	//Construct Context
 	v.status.PackageName = v.PackageName
-	v.status.DomainName = v.DomainName
 
 	if !v.status.IsRunning {
 		err = v.pointloop()
@@ -81,10 +74,10 @@ func (v *V2RayPoint) StopLoop() (err error) {
 	defer v.v2rayOP.Unlock()
 	if v.status.IsRunning {
 		v.status.IsRunning = false
-		go v.escorter.EscortingDown()
 		go v.status.Vpoint.Close()
+		go v.escorter.EscortingDown()
 		v.SupportSet.Shutdown()
-		v.Callbacks.OnEmitStatus(0, "Closed")
+		v.SupportSet.OnEmitStatus(0, "Closed")
 	}
 	return
 }
@@ -92,17 +85,6 @@ func (v *V2RayPoint) StopLoop() (err error) {
 //Delegate Funcation
 func (v *V2RayPoint) GetIsRunning() bool {
 	return v.status.IsRunning
-}
-
-//Delegate Funcation
-func (v *V2RayPoint) VpnSupportReady(localDNS bool, enableIPv6 bool) {
-	// APP VPNService establish
-	v.SupportSet.Setup(v.status.GetVPNSetupArg(localDNS, enableIPv6))
-	v.escorter.EscortingUp()
-	go v.escorter.EscortRun(
-		v.status.GetApp("tun2socks"),
-		v.status.GetTun2socksArgs(v.SupportSet.GetVPNFd(), localDNS, enableIPv6),
-		"")
 }
 
 //Delegate Funcation
@@ -130,6 +112,9 @@ func (v V2RayPoint) protectFd(network, address string, fd uintptr) error {
 }
 
 func (v *V2RayPoint) pointloop() error {
+	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\n",
+		v.EnableLocalDNS,
+		v.ForwardIpv6)
 
 	//TODO:Parse Configure File
 	log.Println("loading v2ray config")
@@ -169,9 +154,12 @@ func (v *V2RayPoint) pointloop() error {
 		return err
 	}
 
+	v.SupportSet.Prepare()
+	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6)) // vpnservice.establish()
+
 	log.Println("run vpn apps")
-	v.SupportSet.Prepare() // app will call V2rayPoint.VpnSupportReady
-	v.Callbacks.OnEmitStatus(0, "Running")
+	v.runTun2socks()
+	v.SupportSet.OnEmitStatus(0, "Running")
 	return nil
 }
 
@@ -196,6 +184,10 @@ func initV2Env() {
 		return os.Open(path)
 	}
 
+	// https://github.com/golang/go/issues/10714
+	// force use cgo on android.
+	os.Setenv("LOCALDOMAIN", "1")
+
 	// opt-in TLS 1.3 for Go1.12
 	// TODO: remove this line when Go1.13 is released.
 	os.Setenv("GODEBUG", "tls13=1")
@@ -217,6 +209,15 @@ func NewV2RayPoint() *V2RayPoint {
 		status:   _status,
 		escorter: &Escort.Escorting{Status: _status},
 	}
+}
+
+func (v V2RayPoint) runTun2socks() {
+	// APP VPNService establish
+	v.escorter.EscortingUp()
+	go v.escorter.EscortRun(
+		v.status.GetApp("tun2socks"),
+		v.status.GetTun2socksArgs(v.SupportSet.GetVPNFd(), v.EnableLocalDNS, v.ForwardIpv6),
+		"")
 }
 
 /*CheckVersion int

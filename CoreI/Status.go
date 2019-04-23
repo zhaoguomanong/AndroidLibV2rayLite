@@ -9,7 +9,6 @@ import (
 type Status struct {
 	IsRunning   bool
 	PackageName string
-	DomainName  string
 
 	Vpoint v2core.Server
 }

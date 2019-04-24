@@ -10,6 +10,7 @@ import (
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
+	"github.com/2dust/AndroidLibV2rayLite/VPN"
 	"github.com/2dust/AndroidLibV2rayLite/shippedBinarys"
 	mobasset "golang.org/x/mobile/asset"
 
@@ -38,6 +39,8 @@ type V2RayPoint struct {
 	v2rayOP  *sync.Mutex
 
 	PackageName          string
+	DomainName           string
+	DomainIP             string
 	ConfigureFileContent string
 	EnableLocalDNS       bool
 	ForwardIpv6          bool
@@ -88,11 +91,6 @@ func (v *V2RayPoint) GetIsRunning() bool {
 }
 
 //Delegate Funcation
-func (v *V2RayPoint) SetVpnSupportSet(vs V2RayVPNServiceSupportsSet) {
-	v.SupportSet = vs
-}
-
-//Delegate Funcation
 func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
 	if v.statsManager == nil {
 		return 0
@@ -112,9 +110,18 @@ func (v V2RayPoint) protectFd(network, address string, fd uintptr) error {
 }
 
 func (v *V2RayPoint) pointloop() error {
-	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\n",
+	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s\nDomainIP: %s",
 		v.EnableLocalDNS,
-		v.ForwardIpv6)
+		v.ForwardIpv6,
+		v.DomainName,
+		v.DomainIP)
+
+	dialer := &VPN.VPNProtectedDialer{
+		DomainName: v.DomainName,
+		DomainIP:   v.DomainIP,
+		SupportSet: v.SupportSet,
+	}
+	dialer.PrepareDomain()
 
 	//TODO:Parse Configure File
 	log.Println("loading v2ray config")
@@ -130,10 +137,6 @@ func (v *V2RayPoint) pointloop() error {
 		log.Println(err)
 		return err
 	}
-
-	// v2ray hooker to protect fd
-	v2internet.RegisterDialerController(v.protectFd)
-	v2internet.RegisterListenerController(v.protectFd)
 
 	//New Start V2Ray Core
 	log.Println("new v2ray core")
@@ -159,6 +162,13 @@ func (v *V2RayPoint) pointloop() error {
 
 	log.Println("run vpn apps")
 	v.runTun2socks()
+
+	// v2ray hooker to protect fd
+	// v2internet.RegisterDialerController(v.protectFd)
+	// v2internet.RegisterListenerController(v.protectFd)
+	log.Println("Register SystemDialer")
+	v2internet.UseAlternativeSystemDialer(dialer)
+
 	v.SupportSet.OnEmitStatus(0, "Running")
 	return nil
 }
@@ -183,10 +193,6 @@ func initV2Env() {
 		}
 		return os.Open(path)
 	}
-
-	// https://github.com/golang/go/issues/10714
-	// force use cgo on android.
-	os.Setenv("LOCALDOMAIN", "1")
 
 	// opt-in TLS 1.3 for Go1.12
 	// TODO: remove this line when Go1.13 is released.

@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
@@ -40,7 +41,6 @@ type V2RayPoint struct {
 
 	PackageName          string
 	DomainName           string
-	DomainIP             string
 	ConfigureFileContent string
 	EnableLocalDNS       bool
 	ForwardIpv6          bool
@@ -110,18 +110,17 @@ func (v V2RayPoint) protectFd(network, address string, fd uintptr) error {
 }
 
 func (v *V2RayPoint) pointloop() error {
-	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s\nDomainIP: %s",
+	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
 		v.EnableLocalDNS,
 		v.ForwardIpv6,
-		v.DomainName,
-		v.DomainIP)
+		v.DomainName)
 
 	dialer := &VPN.VPNProtectedDialer{
 		DomainName: v.DomainName,
-		DomainIP:   v.DomainIP,
 		SupportSet: v.SupportSet,
 	}
-	dialer.PrepareDomain()
+	pch := make(chan bool)
+	go dialer.PrepareDomain(pch)
 
 	//TODO:Parse Configure File
 	log.Println("loading v2ray config")
@@ -158,17 +157,20 @@ func (v *V2RayPoint) pointloop() error {
 	}
 
 	v.SupportSet.Prepare()
+	select {
+	case <-pch: // block until ready
+	case <-time.After(3 * time.Second):
+	}
+	if !dialer.PreparedReady {
+		v.SupportSet.OnEmitStatus(0, "Closed")
+		return nil
+	}
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6)) // vpnservice.establish()
 
 	log.Println("run vpn apps")
 	v.runTun2socks()
-
 	// v2ray hooker to protect fd
-	// v2internet.RegisterDialerController(v.protectFd)
-	// v2internet.RegisterListenerController(v.protectFd)
-	log.Println("Register SystemDialer")
 	v2internet.UseAlternativeSystemDialer(dialer)
-
 	v.SupportSet.OnEmitStatus(0, "Running")
 	return nil
 }

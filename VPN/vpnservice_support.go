@@ -27,26 +27,25 @@ type VPNProtectedDialer struct {
 	preparedPort  int
 }
 
-func (d *VPNProtectedDialer) PrepareDomain(pch chan bool) {
+func (d *VPNProtectedDialer) PrepareDomain(pch chan<- bool) {
 	log.Printf("Preparing Domain: %s", d.DomainName)
-	_host, _port, err := net.SplitHostPort(d.DomainName)
-	if err != nil {
-		log.Printf("PrepareDomain DomainName Err: %v", err)
-	}
-	_iport, err := strconv.Atoi(_port)
-	if err != nil {
-		log.Printf("PrepareDomain DomainName Err: %v", err)
+	_host, _port, serr := net.SplitHostPort(d.DomainName)
+	_iport, perr := strconv.Atoi(_port)
+	if serr != nil || perr != nil {
+		log.Printf("PrepareDomain DomainName Err: %v|%v", serr, perr)
+		goto PEND
 	}
 	d.preparedPort = _iport
 	if ips, err := net.LookupIP(_host); err == nil {
 		d.preparedIPs = ips
 		d.PreparedReady = true
-		if pch != nil {
-			pch <- true
-		}
 	} else {
 		log.Printf("PrepareDomain LookupIP Err: %v", err)
 	}
+
+PEND:
+	pch <- true
+	log.Printf("Prepare Result: Ready: %v Domain: %s Port: %s IPs: %v", d.PreparedReady, _host, _port, d.preparedIPs)
 }
 
 func (d *VPNProtectedDialer) prepareFd(network v2net.Network) (fd int, err error) {

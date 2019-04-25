@@ -2,7 +2,8 @@ pb:
 	  go get -u github.com/golang/protobuf/protoc-gen-go
 		@echo "pb Start"
 asset:
-	@echo $(shell ./gen_assets.sh)
+	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geosite.dat > geosite.dat		
+	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geoip.dat > geoip.dat
 
 shippedBinary:
 	cd shippedBinarys; $(MAKE) shippedBinary

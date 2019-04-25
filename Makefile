@@ -2,6 +2,7 @@ pb:
 	  go get -u github.com/golang/protobuf/protoc-gen-go
 		@echo "pb Start"
 asset:
+	mkdir assets
 	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geosite.dat > geosite.dat		
 	cd assets;curl https://raw.githubusercontent.com/2dust/AndroidLibV2rayLite/master/data/geoip.dat > geoip.dat
 

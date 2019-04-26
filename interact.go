@@ -159,11 +159,12 @@ func (v *V2RayPoint) pointloop() error {
 	v.SupportSet.Prepare()
 	select {
 	case <-pch: // block until ready
-	case <-time.After(3 * time.Second):
+	case <-time.After(10 * time.Second):
 	}
 	if !dialer.PreparedReady {
-		v.SupportSet.OnEmitStatus(0, "Closed")
-		return nil
+		v.status.IsRunning = false
+		v.status.Vpoint.Close()
+		return fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
 	}
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6)) // vpnservice.establish()
 

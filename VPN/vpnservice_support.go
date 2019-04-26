@@ -45,7 +45,7 @@ func (d *VPNProtectedDialer) PrepareDomain(pch chan<- bool) {
 
 PEND:
 	pch <- true
-	log.Printf("Prepare Result: Ready: %v Domain: %s Port: %s IPs: %v", d.PreparedReady, _host, _port, d.preparedIPs)
+	log.Printf("Prepare Result:\n Ready: %v\n Domain: %s\n Port: %s\n IPs: %v\n", d.PreparedReady, _host, _port, d.preparedIPs)
 }
 
 func (d *VPNProtectedDialer) prepareFd(network v2net.Network) (fd int, err error) {

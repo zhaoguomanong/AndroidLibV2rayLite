@@ -164,6 +164,7 @@ func (v *V2RayPoint) pointloop() error {
 	if !dialer.PreparedReady {
 		v.status.IsRunning = false
 		v.status.Vpoint.Close()
+		v.SupportSet.OnEmitStatus(0, "Closed")
 		return fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
 	}
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6)) // vpnservice.establish()

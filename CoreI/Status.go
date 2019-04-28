@@ -41,7 +41,7 @@ func (v *Status) GetTun2socksArgs(fd int, localDNS bool, enableIPv6 bool) (ret [
 		"--enable-udprelay"}
 
 	if enableIPv6 {
-		ret = append(ret, "--netif-ip6addr", "fd26:2626::2")
+		ret = append(ret, "--netif-ip6addr", "da26:2626::2")
 	}
 
 	if localDNS {
@@ -55,7 +55,7 @@ func (v *Status) GetVPNSetupArg(localDNS bool, enableIPv6 bool) (ret string) {
 	ret = "m,1500 a,26.26.26.1,30 r,0.0.0.0,0"
 
 	if enableIPv6 {
-		ret += " a,fd26:2626::1,126 r,::,0"
+		ret += " a,da26:2626::1,126 r,::,0"
 	}
 	if localDNS {
 		ret += " d,26.26.26.2"

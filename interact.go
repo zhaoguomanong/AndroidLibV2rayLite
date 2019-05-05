@@ -77,10 +77,13 @@ func (v *V2RayPoint) StopLoop() (err error) {
 	defer v.v2rayOP.Unlock()
 	if v.status.IsRunning {
 		v.status.IsRunning = false
-		v.status.Vpoint.Close()
+		err = v.status.Vpoint.Close()
 		go v.escorter.EscortingDown()
 		v.SupportSet.Shutdown()
 		v.SupportSet.OnEmitStatus(0, "Closed")
+	}
+	if err != nil {
+		log.Println(err)
 	}
 	return
 }

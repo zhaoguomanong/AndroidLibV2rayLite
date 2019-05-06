@@ -191,6 +191,7 @@ PERR:
 	v.status.IsRunning = false
 	v.status.Vpoint.Close()
 	v.SupportSet.OnEmitStatus(0, "Closed")
+	log.Println(err)
 	return perr
 }
 

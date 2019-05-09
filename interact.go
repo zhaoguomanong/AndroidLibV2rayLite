@@ -48,7 +48,6 @@ type V2RayPoint struct {
 
 /*V2RayVPNServiceSupportsSet To support Android VPN mode*/
 type V2RayVPNServiceSupportsSet interface {
-	GetVPNFd() int
 	Setup(Conf string) int
 	Prepare() int
 	Shutdown() int
@@ -78,6 +77,8 @@ func (v *V2RayPoint) StopLoop() (err error) {
 	if v.status.IsRunning {
 		v.status.IsRunning = false
 		err = v.status.Vpoint.Close()
+		v.status.Vpoint = nil
+		v.statsManager = nil
 		go v.escorter.EscortingDown()
 		v.SupportSet.Shutdown()
 		v.SupportSet.OnEmitStatus(0, "Closed")
@@ -102,7 +103,7 @@ func (v V2RayPoint) QueryStats(tag string, direct string) int64 {
 	if counter == nil {
 		return 0
 	}
-	return counter.Value()
+	return counter.Set(0)
 }
 
 func (v V2RayPoint) protectFd(network, address string, fd uintptr) error {
@@ -113,11 +114,19 @@ func (v V2RayPoint) protectFd(network, address string, fd uintptr) error {
 }
 
 func (v *V2RayPoint) pointloop() error {
+
+	//TODO:Load Shipped Binary
+	shipb := shippedBinarys.FirstRun{Status: v.status}
+	if err := shipb.CheckAndExport(); err != nil {
+		log.Println(err)
+		return err
+	}
+	v.runTun2socks()
+
 	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
 		v.EnableLocalDNS,
 		v.ForwardIpv6,
 		v.DomainName)
-	v.runTun2socks()
 
 	dialer := &VPN.VPNProtectedDialer{
 		DomainName: v.DomainName,
@@ -134,13 +143,6 @@ func (v *V2RayPoint) pointloop() error {
 		return err
 	}
 
-	//TODO:Load Shipped Binary
-	shipb := shippedBinarys.FirstRun{Status: v.status}
-	if err := shipb.CheckAndExport(); err != nil {
-		log.Println(err)
-		return err
-	}
-
 	//New Start V2Ray Core
 	log.Println("new v2ray core")
 	inst, err := v2core.New(config)
@@ -148,7 +150,6 @@ func (v *V2RayPoint) pointloop() error {
 		log.Println(err)
 		return err
 	}
-
 	v.status.Vpoint = inst
 	v.statsManager = inst.GetFeature(v2stats.ManagerType()).(v2stats.Manager)
 
@@ -168,8 +169,10 @@ func (v *V2RayPoint) pointloop() error {
 
 	if !dialer.PreparedReady {
 		err := fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
-		v.status.IsRunning = false
 		v.status.Vpoint.Close()
+		v.status.IsRunning = false
+		v.status.Vpoint = nil
+		v.statsManager = nil
 		v.SupportSet.OnEmitStatus(0, "Closed")
 		log.Println(err)
 		return err

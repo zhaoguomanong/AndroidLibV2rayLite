@@ -10,8 +10,7 @@ __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 __base="$(basename ${__file} .sh)"
 
 
-ASSETS=${__dir}/assets
-mkdir -p ${ASSETS}
+DATADIR=${__dir}/data
 
 gen_assets() {
     local TMPDIR=$(mktemp -d)
@@ -26,7 +25,15 @@ gen_assets() {
         cd ${GEOSITE} && git clone https://github.com/v2ray/domain-list-community.git .
     fi
     go run main.go
-    mv dlc.dat $ASSETS/geosite.dat
+
+    if [[ -e dlc.dat ]]; then
+        rm -f $DATADIR/geosite.dat
+        mv dlc.dat $DATADIR/geosite.dat
+        echo "----------> geosite.dat updated."
+    else
+        echo "----------> geosite.dat failed to update."
+    fi
+
 
     if [[ ! -x $GOPATH/bin/geoip ]]; then
         go get -v -u github.com/v2ray/geoip
@@ -34,14 +41,20 @@ gen_assets() {
 
     cd $TMPDIR
     curl -L -O http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip
-    unzip GeoLite2-Country-CSV.zip
-    mkdir geoip && find . -name '*.csv' -exec mv {} ./geoip \;
+    unzip -q GeoLite2-Country-CSV.zip
+    mkdir geoip && find . -name '*.csv' -exec mv -t ./geoip {} +
     $GOPATH/bin/geoip \
         --country=./geoip/GeoLite2-Country-Locations-en.csv \
         --ipv4=./geoip/GeoLite2-Country-Blocks-IPv4.csv \
         --ipv6=./geoip/GeoLite2-Country-Blocks-IPv6.csv
 
-    mv ./geoip.dat $ASSETS/geoip.dat
+    if [[ -e geoip.dat ]]; then
+        rm -f $DATADIR/geoip.dat
+        mv ./geoip.dat $DATADIR/geoip.dat
+        echo "----------> geoip.dat updated."
+    else
+        echo "----------> geoip.dat failed to update."
+    fi
     trap ERR
     return 0
 }

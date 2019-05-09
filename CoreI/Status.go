@@ -1,8 +1,6 @@
 package CoreI
 
 import (
-	"strconv"
-
 	v2core "v2ray.com/core"
 )
 
@@ -14,7 +12,7 @@ type Status struct {
 }
 
 func CheckVersion() int {
-	return 19
+	return 20
 }
 
 func (v *Status) GetDataDir() string {
@@ -25,20 +23,21 @@ func (v *Status) GetApp(name string) string {
 	return v.PackageName + name
 }
 
-func (v *Status) GetTun2socksArgs(fd int, localDNS bool, enableIPv6 bool) (ret []string) {
+func (v *Status) GetTun2socksArgs(localDNS bool, enableIPv6 bool) (ret []string) {
 	ret = []string{"--netif-ipaddr",
 		"26.26.26.2",
 		"--netif-netmask",
 		"255.255.255.252",
 		"--socks-server-addr",
 		"127.0.0.1:10808",
-		"--tunfd",
-		strconv.Itoa(fd),
 		"--tunmtu",
 		"1500",
 		"--loglevel",
 		"notice",
-		"--enable-udprelay"}
+		"--enable-udprelay",
+		"--sock-path",
+		v.GetDataDir() + "sock_path",
+	}
 
 	if enableIPv6 {
 		ret = append(ret, "--netif-ip6addr", "da26:2626::2")

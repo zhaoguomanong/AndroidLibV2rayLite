@@ -117,6 +117,7 @@ func (v *V2RayPoint) pointloop() error {
 		v.EnableLocalDNS,
 		v.ForwardIpv6,
 		v.DomainName)
+	v.runTun2socks()
 
 	dialer := &VPN.VPNProtectedDialer{
 		DomainName: v.DomainName,
@@ -165,34 +166,20 @@ func (v *V2RayPoint) pointloop() error {
 	case <-time.After(10 * time.Second):
 	}
 
-	var perr error
-	var vpnfd int
 	if !dialer.PreparedReady {
-		perr = fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
-		goto PERR
+		err := fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
+		v.status.IsRunning = false
+		v.status.Vpoint.Close()
+		v.SupportSet.OnEmitStatus(0, "Closed")
+		log.Println(err)
+		return err
 	}
 
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6))
-	vpnfd = v.SupportSet.GetVPNFd()
-
-	if vpnfd == 0 {
-		perr = fmt.Errorf("Fail to start VPNService, vpnfd: 0")
-		goto PERR
-	}
-
-	log.Println("run vpn apps")
-	v.runTun2socks(vpnfd)
 	// v2ray hooker to protect fd
 	v2internet.UseAlternativeSystemDialer(dialer)
 	v.SupportSet.OnEmitStatus(0, "Running")
 	return nil
-
-PERR:
-	v.status.IsRunning = false
-	v.status.Vpoint.Close()
-	v.SupportSet.OnEmitStatus(0, "Closed")
-	log.Println(err)
-	return perr
 }
 
 func initV2Env() {
@@ -239,12 +226,12 @@ func NewV2RayPoint() *V2RayPoint {
 	}
 }
 
-func (v V2RayPoint) runTun2socks(vpnfd int) {
+func (v V2RayPoint) runTun2socks() {
 	// APP VPNService establish
 	v.escorter.EscortingUp()
 	go v.escorter.EscortRun(
 		v.status.GetApp("tun2socks"),
-		v.status.GetTun2socksArgs(vpnfd, v.EnableLocalDNS, v.ForwardIpv6),
+		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6),
 		"")
 }
 

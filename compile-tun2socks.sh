@@ -5,12 +5,9 @@ __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 __base="$(basename ${__file} .sh)"
 
-
-
 TMPDIR=$(mktemp -d)
-
-cp $__dir/tun2socks.mk $TMPDIR
 cd $TMPDIR
+cp $__dir/tun2socks.mk .
 git clone --depth=1 https://github.com/shadowsocks/badvpn.git
 git clone --depth=1 https://github.com/shadowsocks/libancillary.git
 
@@ -28,3 +25,5 @@ install -v -m755 libs/arm64-v8a/tun2socks    $__dir/shippedBinarys/ArchDep/arm64
 install -v -m755 libs/x86/tun2socks          $__dir/shippedBinarys/ArchDep/386/ 
 install -v -m755 libs/x86_64/tun2socks       $__dir/shippedBinarys/ArchDep/amd64/ 
 
+cd $__dir
+rm -rf $TMPDIR

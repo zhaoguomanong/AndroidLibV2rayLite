@@ -3,16 +3,17 @@ package Escort
 import (
 	"os"
 	"os/exec"
+	"time"
 
 	"log"
+
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 )
 
-func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
-	log.Println(proc)
-	log.Println(pt)
-	count := 42
-	for count > 0 {
+func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string, sendFd func() int) {
+	log.Println(proc, pt)
+	count := 0
+	for count <= 42 {
 		cmd := exec.Command(proc, pt...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -35,14 +36,22 @@ func (v *Escorting) EscortRun(proc string, pt []string, additionalEnv string) {
 
 		*v.escortProcess = append(*v.escortProcess, cmd.Process)
 		log.Println("EscortRun Waiting....")
+
+		if count > 0 {
+			go func() {
+				time.Sleep(time.Second)
+				sendFd()
+			}()
+		}
+
 		if err := cmd.Wait(); err != nil {
 			log.Println("EscortRun cmd.Wait err:", err)
 		}
 
 	CMDERROR:
 		if v.Status.IsRunning {
-			log.Println("EscortRun Unexpected Exit")
-			count--
+			log.Println("EscortRun Unexpected Exit, Restart now.")
+			count++
 		} else {
 			log.Println("EscortRun Exit")
 			break

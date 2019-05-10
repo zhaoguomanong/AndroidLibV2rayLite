@@ -53,6 +53,7 @@ type V2RayVPNServiceSupportsSet interface {
 	Shutdown() int
 	Protect(int) int
 	OnEmitStatus(int, string) int
+	SendFd() int
 }
 
 /*RunLoop Run V2Ray main loop
@@ -75,11 +76,7 @@ func (v *V2RayPoint) StopLoop() (err error) {
 	v.v2rayOP.Lock()
 	defer v.v2rayOP.Unlock()
 	if v.status.IsRunning {
-		v.status.IsRunning = false
-		err = v.status.Vpoint.Close()
-		v.status.Vpoint = nil
-		v.statsManager = nil
-		go v.escorter.EscortingDown()
+		v.shutdownInit()
 		v.SupportSet.Shutdown()
 		v.SupportSet.OnEmitStatus(0, "Closed")
 	}
@@ -113,15 +110,19 @@ func (v V2RayPoint) protectFd(network, address string, fd uintptr) error {
 	return nil
 }
 
-func (v *V2RayPoint) pointloop() error {
+func (v *V2RayPoint) shutdownInit() {
+	v.status.IsRunning = false
+	v.status.Vpoint.Close()
+	v.status.Vpoint = nil
+	v.statsManager = nil
+	v.escorter.EscortingDown()
+}
 
-	//TODO:Load Shipped Binary
-	shipb := shippedBinarys.FirstRun{Status: v.status}
-	if err := shipb.CheckAndExport(); err != nil {
+func (v *V2RayPoint) pointloop() error {
+	if err := v.runTun2socks(); err != nil {
 		log.Println(err)
 		return err
 	}
-	v.runTun2socks()
 
 	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
 		v.EnableLocalDNS,
@@ -168,12 +169,9 @@ func (v *V2RayPoint) pointloop() error {
 	}
 
 	if !dialer.PreparedReady {
-		err := fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
-		v.status.Vpoint.Close()
-		v.status.IsRunning = false
-		v.status.Vpoint = nil
-		v.statsManager = nil
+		v.shutdownInit()
 		v.SupportSet.OnEmitStatus(0, "Closed")
+		err := fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
 		log.Println(err)
 		return err
 	}
@@ -229,13 +227,20 @@ func NewV2RayPoint() *V2RayPoint {
 	}
 }
 
-func (v V2RayPoint) runTun2socks() {
-	// APP VPNService establish
+func (v V2RayPoint) runTun2socks() error {
+	shipb := shippedBinarys.FirstRun{Status: v.status}
+	if err := shipb.CheckAndExport(); err != nil {
+		log.Println(err)
+		return err
+	}
+
 	v.escorter.EscortingUp()
 	go v.escorter.EscortRun(
 		v.status.GetApp("tun2socks"),
-		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6),
-		"")
+		v.status.GetTun2socksArgs(v.EnableLocalDNS, v.ForwardIpv6), "",
+		v.SupportSet.SendFd)
+
+	return nil
 }
 
 /*CheckVersion int

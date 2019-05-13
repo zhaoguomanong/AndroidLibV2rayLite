@@ -25,5 +25,7 @@ install -v -m755 libs/arm64-v8a/tun2socks    $__dir/shippedBinarys/ArchDep/arm64
 install -v -m755 libs/x86/tun2socks          $__dir/shippedBinarys/ArchDep/386/ 
 install -v -m755 libs/x86_64/tun2socks       $__dir/shippedBinarys/ArchDep/amd64/ 
 
-cd $__dir
+cd $__dir/shippedBinarys
+make clean && make shippedBinary
+
 rm -rf $TMPDIR

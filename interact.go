@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/2dust/AndroidLibV2rayLite/CoreI"
 	"github.com/2dust/AndroidLibV2rayLite/Process/Escort"
@@ -124,19 +123,17 @@ func (v *V2RayPoint) pointloop() error {
 		return err
 	}
 
+	dialer := &VPN.VPNProtectedDialer{
+		DomainName: v.DomainName,
+		SupportSet: v.SupportSet,
+	}
+	go dialer.PrepareDomain()
+
 	log.Printf("EnableLocalDNS: %v\nForwardIpv6: %v\nDomainName: %s",
 		v.EnableLocalDNS,
 		v.ForwardIpv6,
 		v.DomainName)
 
-	dialer := &VPN.VPNProtectedDialer{
-		DomainName: v.DomainName,
-		SupportSet: v.SupportSet,
-	}
-	pch := make(chan bool)
-	go dialer.PrepareDomain(pch)
-
-	//TODO:Parse Configure File
 	log.Println("loading v2ray config")
 	config, err := v2serial.LoadJSONConfig(strings.NewReader(v.ConfigureFileContent))
 	if err != nil {
@@ -144,7 +141,6 @@ func (v *V2RayPoint) pointloop() error {
 		return err
 	}
 
-	//New Start V2Ray Core
 	log.Println("new v2ray core")
 	inst, err := v2core.New(config)
 	if err != nil {
@@ -163,21 +159,7 @@ func (v *V2RayPoint) pointloop() error {
 	}
 
 	v.SupportSet.Prepare()
-	select {
-	case <-pch: // block until ready
-	case <-time.After(10 * time.Second):
-	}
-
-	if !dialer.PreparedReady {
-		v.shutdownInit()
-		v.SupportSet.OnEmitStatus(0, "Closed")
-		err := fmt.Errorf("Failed Lookup Domain: %s", v.DomainName)
-		log.Println(err)
-		return err
-	}
-
 	v.SupportSet.Setup(v.status.GetVPNSetupArg(v.EnableLocalDNS, v.ForwardIpv6))
-	// v2ray hooker to protect fd
 	v2internet.UseAlternativeSystemDialer(dialer)
 	v.SupportSet.OnEmitStatus(0, "Running")
 	return nil

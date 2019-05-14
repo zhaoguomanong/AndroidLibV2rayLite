@@ -27,25 +27,31 @@ type VPNProtectedDialer struct {
 	preparedPort  int
 }
 
-func (d *VPNProtectedDialer) PrepareDomain(pch chan<- bool) {
+func (d *VPNProtectedDialer) PrepareDomain() {
 	log.Printf("Preparing Domain: %s", d.DomainName)
 	_host, _port, serr := net.SplitHostPort(d.DomainName)
 	_iport, perr := strconv.Atoi(_port)
 	if serr != nil || perr != nil {
 		log.Printf("PrepareDomain DomainName Err: %v|%v", serr, perr)
-		goto PEND
+		return
 	}
-	d.preparedPort = _iport
-	if ips, err := net.LookupIP(_host); err == nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	r := net.Resolver{PreferGo: false}
+	if addrs, err := r.LookupIPAddr(ctx, _host); err == nil {
+		ips := make([]net.IP, len(addrs))
+		for i, ia := range addrs {
+			ips[i] = ia.IP
+		}
 		d.preparedIPs = ips
+		d.preparedPort = _iport
 		d.PreparedReady = true
+		cancel()
+		log.Printf("Prepare Result:\n Ready: %v\n Domain: %s\n Port: %s\n IPs: %v\n", d.PreparedReady, _host, _port, d.preparedIPs)
 	} else {
 		log.Printf("PrepareDomain LookupIP Err: %v", err)
+		time.Sleep(3 * time.Second)
+		go d.PrepareDomain()
 	}
-
-PEND:
-	pch <- true
-	log.Printf("Prepare Result:\n Ready: %v\n Domain: %s\n Port: %s\n IPs: %v\n", d.PreparedReady, _host, _port, d.preparedIPs)
 }
 
 func (d *VPNProtectedDialer) prepareFd(network v2net.Network) (fd int, err error) {
@@ -65,7 +71,7 @@ func (d VPNProtectedDialer) Dial(ctx context.Context, src v2net.Address, dest v2
 	network := dest.Network.SystemString()
 	Address := dest.NetAddr()
 
-	if Address == d.DomainName {
+	if Address == d.DomainName && d.PreparedReady {
 		ip := d.preparedIPs[rand.Intn(len(d.preparedIPs))]
 		if fd, err := d.prepareFd(dest.Network); err == nil {
 			return d.fdConn(ctx, ip, d.preparedPort, fd)

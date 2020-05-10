@@ -76,4 +76,4 @@ source ~/.bashrc
 # Make sure you can execute 32 bit executables if this is 64 bit machine, otherwise skip this
 dpkg --add-architecture i386
 apt-get update
-apt-get install -y libc6:i386 libstdc++6:i386 zlib1g:i386
+apt-get install -y libc6:i386 libstdc++6:i386 zlib1g:i386 lib32z1 expect
